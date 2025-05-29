@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comuna Socialista El Panal 2021 - Inicio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=EB+Garamond:ital,wght@1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/normalize.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-blue-50 text-gray-800">
+
+    <nav class="bg-red-700 p-4 shadow-md relative" style="background: none;">
+        <div class="navbar-bg absolute left-0 top-0 w-full h-[370px] md:h-[420px] z-0"></div>
+        <div class="container mx-auto flex flex-col items-center justify-center relative z-10 h-[370px] md:h-[420px]">
+            <div class="flex flex-col items-center justify-center w-full h-full">
+                <a href="#" class="flex items-center justify-center w-full mt-10">
+                    <span class="logo-bg-contrast logo-anim" id="logoAnim">
+                        <img src="/assets/images/logo_comuna_chavez.png" 
+                     alt="Logo Comuna El Panal 2021" 
+                             class="navbar-logo-giant mx-auto" 
+                     onerror="this.style.display='none';">
+                    </span>
+            </a>
+                <div id="frases-comunidad" class="w-full flex justify-center mt-10 mb-2 min-h-[80px]">
+                    <div id="fraseActual" class="transition-opacity duration-700 opacity-100"></div>
+                </div>
+                <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-200 rounded-lg md:hidden hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 logo-bg-contrast" aria-controls="navbar-default" aria-expanded="false" id="navbar-toggler">
+                <span class="sr-only">Abrir menú principal</span>
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                </svg>
+            </button>
+                <div class="hidden w-full md:block md:w-auto mt-8" id="navbar-default">
+                    <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-4 rtl:space-x-reverse md:mt-0">
+                    <li>
+                            <a href="#" class="flex items-center justify-center gap-2 px-2 py-1 border border-gray-300 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 btn-hover-scale-lg">
+                                <span class="bg-blue-200 p-1 rounded-lg flex items-center justify-center hidden lg:flex">
+                                    <img src="/assets/icons/icono_casa.png" alt="Inicio" class="w-4 h-4">
+                                </span>
+                                <span class="text-sm">Inicio</span>
+                            </a>
+                    </li>
+                    <li>
+                            <a href="#acceder" class="flex items-center justify-center gap-2 px-2 py-1 border border-gray-300 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 btn-hover-scale-lg">
+                                <span class="bg-blue-200 p-1 rounded-lg flex items-center justify-center hidden lg:flex">
+                                    <img src="/assets/icons/icono_acceder.png" alt="Acceder / Registrarse" class="w-4 h-4">
+                                </span>
+                                <span class="text-sm">Acceder / Registrarse</span>
+                            </a>
+                    </li>
+                    <li>
+                            <a href="#noticias" class="flex items-center justify-center gap-2 px-2 py-1 border border-gray-300 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 btn-hover-scale-lg">
+                                <span class="bg-blue-200 p-1 rounded-lg flex items-center justify-center hidden lg:flex">
+                                    <img src="/assets/icons/icono_noticias.png" alt="Noticias" class="w-4 h-4">
+                                </span>
+                                <span class="text-sm">Noticias</span>
+                            </a>
+                    </li>
+                    <li>
+                            <a href="#eventos" class="flex items-center justify-center gap-2 px-2 py-1 border border-gray-300 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 btn-hover-scale-lg">
+                                <span class="bg-blue-200 p-1 rounded-lg flex items-center justify-center hidden lg:flex">
+                                    <img src="/assets/icons/icono_eventos.png" alt="Eventos" class="w-4 h-4">
+                                </span>
+                                <span class="text-sm">Eventos</span>
+                            </a>
+                    </li>
+                    <li>
+                            <a href="#nosotros" class="flex items-center justify-center gap-2 px-2 py-1 border border-gray-300 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 btn-hover-scale-lg">
+                                <span class="bg-blue-200 p-1 rounded-lg flex items-center justify-center hidden lg:flex">
+                                    <img src="/assets/icons/icono_nosotros.png" alt="Sobre Nosotros" class="w-4 h-4">
+                                </span>
+                                <span class="text-sm">Sobre Nosotros</span>
+                            </a>
+                    </li>
+                    <li>
+                            <a href="#contacto" class="flex items-center justify-center gap-2 px-2 py-1 border border-gray-300 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 btn-hover-scale-lg">
+                                <span class="bg-blue-200 p-1 rounded-lg flex items-center justify-center hidden lg:flex">
+                                    <img src="/assets/icons/icono_contacto.png" alt="Contacto" class="w-4 h-4">
+                                </span>
+                                <span class="text-sm">Contacto</span>
+                            </a>
+                    </li>
+                </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-banner text-white py-20 md:py-32 -mt-8">
+        <div class="container mx-auto text-center p-6 rounded-lg shadow-xl fade-in-up hero-text-container-hover">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 hero-title">Bienvenido/a a la Comuna El Panal 2021</h1>
+            <p class="text-lg md:text-2xl mb-8">Un espacio digital para la organización y el bienestar de nuestra comunidad.</p>
+            <a href="#acceder" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 md:py-3 px-4 md:px-8 rounded-lg text-base md:text-lg shadow hover:shadow-lg transition duration-300 transform hover:scale-105 inline-block">Únete o Inicia Sesión</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto -mt-8 mb-12">
+        <section id="bienvenida" class="bg-gradient-to-br from-yellow-400 via-blue-500 to-red-600 p-8 rounded-lg shadow-lg mb-10 animated-gradient">
+            <div class="bg-white/90 backdrop-blur-sm p-8 rounded-lg">
+            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">¡Construyendo Juntos Nuestra Comuna!</h2>
+                <div class="max-w-3xl mx-auto">
+                    <div class="relative">
+                        <div class="absolute -left-4 top-0 bottom-0 w-1 bg-yellow-500 rounded-full"></div>
+                        <p class="text-gray-700 leading-relaxed mb-6 pl-6 text-lg">
+                Este es el sistema de censo y gestión de la Comuna Socialista El Panal 2021, ubicada en la parroquia 23 de Enero, Caracas.
+                Nuestra misión es facilitar la comunicación directa y eficiente entre los habitantes y el Gobierno Comunal.
+                Aquí podrás registrar a tu núcleo familiar, reportar necesidades o problemas en tu hogar o sector,
+                hacer seguimiento a tus solicitudes y mantenerte informado sobre las gestiones que se realizan para el beneficio de todos.
+            </p>
+                        <p class="text-gray-700 leading-relaxed pl-6 text-lg italic border-l-4 border-red-700 pl-6 py-2">
+                Invitamos a todas las familias a registrarse y participar activamente. ¡Tu voz es importante para el desarrollo y
+                bienestar de El Panal 2021!
+            </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="acceder" class="bg-gray-50 p-8 rounded-lg shadow-lg mb-10">
+            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Acceso al Sistema</h2>
+            <div class="max-w-md mx-auto">
+                <p class="text-gray-700 leading-relaxed mb-4 text-center">
+                    Próximamente aquí encontrarás los formularios para iniciar sesión si ya tienes una cuenta, o para registrar a tu núcleo familiar por primera vez.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="/login.html" class="bg-red-700 hover:bg-red-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 w-full sm:w-auto text-center">
+                        Iniciar Sesión
+                    </a>
+                    <a href="/register.html" class="bg-yellow-500 hover:bg-yellow-600 text-red-800 font-bold py-3 px-6 rounded-lg transition duration-300 w-full sm:w-auto text-center">
+                        Registrar Familia
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="noticias" class="bg-white p-8 rounded-lg shadow-lg mb-10">
+            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Noticias de la Comuna</h2>
+            <div class="space-y-6">
+                <article class="news-item">
+                    <h3 class="text-xl font-semibold text-red-600 mb-2">Jornada de Vacunación Exitosa en el Sector A</h3>
+                    <p class="text-sm text-gray-500 mb-2">Publicado: 25 de Mayo, 2024</p>
+                    <p class="text-gray-700 leading-relaxed">
+                        El pasado fin de semana se llevó a cabo una jornada de vacunación contra la influenza y el COVID-19 en el ambulatorio del Sector A, beneficiando a más de 200 vecinos y vecinas. Agradecemos la participación de la comunidad y el apoyo de las brigadas de salud.
+                    </p>
+                    <a href="#" class="text-yellow-600 hover:text-yellow-700 font-medium">Leer más...</a>
+                </article>
+                <article class="news-item">
+                    <h3 class="text-xl font-semibold text-red-600 mb-2">Avances en la Rehabilitación de la Cancha Deportiva</h3>
+                    <p class="text-sm text-gray-500 mb-2">Publicado: 22 de Mayo, 2024</p>
+                    <p class="text-gray-700 leading-relaxed">
+                        Los trabajos de rehabilitación de la cancha deportiva múltiple avanzan a buen ritmo. Ya se ha completado la reparación del cercado perimetral y la pintura de las gradas. Próximamente se iniciará la demarcación de la cancha.
+                    </p>
+                    <a href="#" class="text-yellow-600 hover:text-yellow-700 font-medium">Leer más...</a>
+                </article>
+                <article class="news-item">
+                    <h3 class="text-xl font-semibold text-red-600 mb-2">Convocatoria a Asamblea General de Ciudadanos y Ciudadanas</h3>
+                    <p class="text-sm text-gray-500 mb-2">Publicado: 20 de Mayo, 2024</p>
+                    <p class="text-gray-700 leading-relaxed">
+                        Se convoca a todos los habitantes de la Comuna El Panal 2021 a la Asamblea General que se realizará el próximo Sábado 1 de Junio a las 3:00 PM en la Casa Comunal. Puntos a tratar: presupuesto participativo y elección de nuevos voceros. ¡Tu asistencia es crucial!
+                    </p>
+                    <a href="#" class="text-yellow-600 hover:text-yellow-700 font-medium">Leer más...</a>
+                </article>
+            </div>
+        </section>
+
+        <section id="eventos" class="bg-gray-50 p-8 rounded-lg shadow-lg mb-10">
+            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Próximos Eventos</h2>
+            <div class="space-y-6">
+                <div class="event-item">
+                    <h3 class="text-xl font-semibold text-red-600 mb-1">Asamblea General de Ciudadanos</h3>
+                    <p class="text-gray-700"><strong class="font-medium">Fecha:</strong> Sábado, 01 de Junio de 2024</p>
+                    <p class="text-gray-700"><strong class="font-medium">Hora:</strong> 3:00 PM</p>
+                    <p class="text-gray-700"><strong class="font-medium">Lugar:</strong> Casa Comunal</p>
+                    <p class="text-gray-600 mt-1">Discusión sobre presupuesto participativo y elección de voceros.</p>
+                </div>
+                <div class="event-item">
+                    <h3 class="text-xl font-semibold text-red-600 mb-1">Feria Agroalimentaria Comunal</h3>
+                    <p class="text-gray-700"><strong class="font-medium">Fecha:</strong> Sábado, 08 de Junio de 2024</p>
+                    <p class="text-gray-700"><strong class="font-medium">Hora:</strong> 8:00 AM - 2:00 PM</p>
+                    <p class="text-gray-700"><strong class="font-medium">Lugar:</strong> Plaza Central de la Comuna</p>
+                    <p class="text-gray-600 mt-1">Venta de productos frescos a precios solidarios, directamente del productor al consumidor.</p>
+                </div>
+                <div class="event-item">
+                    <h3 class="text-xl font-semibold text-red-600 mb-1">Taller de Formación en Huertos Urbanos</h3>
+                    <p class="text-gray-700"><strong class="font-medium">Fecha:</strong> Miércoles, 12 de Junio de 2024</p>
+                    <p class="text-gray-700"><strong class="font-medium">Hora:</strong> 9:00 AM</p>
+                    <p class="text-gray-700"><strong class="font-medium">Lugar:</strong> Espacio Socioproductivo "Manos a la Siembra"</p>
+                    <p class="text-gray-600 mt-1">Aprende técnicas básicas para iniciar tu propio huerto en casa. ¡Inscripciones abiertas!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="nosotros" class="bg-white p-8 rounded-lg shadow-lg mb-10">
+            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Sobre El Panal 2021</h2>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        La Comuna Socialista El Panal 2021 es una organización popular con profundas raíces en la historia de lucha y resistencia de la parroquia 23 de Enero. Nos esforzamos por construir un modelo de autogobierno y producción que beneficie directamente a nuestros habitantes, promoviendo valores de solidaridad, participación protagónica y justicia social.
+                    </p>
+                    <p class="text-gray-700 leading-relaxed">
+                        Este sistema digital es una herramienta más para fortalecer nuestros lazos y optimizar la gestión de los recursos y necesidades de la comunidad.
+                    </p>
+                </div>
+                <div>
+                    <img src="/assets/images/portal_comuna_panal.jpg" alt="Imagen representativa de la comunidad El Panal 2021" class="rounded-lg shadow-md w-full h-auto filter grayscale brightness-50" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Error+al+cargar+imagen';">
+                </div>
+            </div>
+        </section>
+
+         <section id="contacto" class="bg-gray-50 p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Contacto</h2>
+            <p class="text-gray-700 leading-relaxed mb-4 text-center">
+                Para más información o asistencia, puedes contactar a la vocería de tu consejo comunal o acercarte a la casa comunal.
+            </p>
+            <p class="text-gray-700 text-center">
+                <strong>Ubicación:</strong> Parroquia 23 de Enero, Caracas, Venezuela.
+            </p>
+        </section>
+    </main>
+
+    <footer class="bg-red-800 text-white p-6 text-center mt-12">
+        <p>&copy; 2024-2025 Comuna Socialista El Panal 2021. Todos los derechos reservados.</p>
+        <p>Desarrollado para el pueblo y por el pueblo.</p>
+    </footer>
+
+    <script src="/js/scripts.js"></script>
+
+</body>
+</html>
