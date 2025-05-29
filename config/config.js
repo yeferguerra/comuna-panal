@@ -26,7 +26,7 @@ module.exports = {
 
     // Configuración de autenticación
     auth: {
-        jwtSecret: process.env.JWT_SECRET || 'clave_secreta_temporal',
+        jwtSecret: process.env.JWT_SECRET,
         jwtExpiration: '24h'
     },
 
