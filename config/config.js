@@ -7,14 +7,22 @@ module.exports = {
         host: process.env.HOST || 'localhost'
     },
 
-    // Configuración de la base de datos
-    database: {
-        url: process.env.DATABASE_URL || 'mongodb://localhost:27017/comuna_panal',
-        options: {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        }
+    // Configuración de la base de datos MySQL
+    db: {
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root', // Usualmente 'root' para desarrollo
+        password: process.env.DB_PASSWORD || '', // La contraseña que configuraste en MySQL
+        database: process.env.DB_NAME || 'comunapanal' // El nombre de la base de datos que creamos
     },
+
+    // Configuración de la base de datos (MongoDB - si aún la necesitas o la eliminas después)
+    // database: {
+    //     url: process.env.DATABASE_URL || 'mongodb://localhost:27017/comuna_panal',
+    //     options: {
+    //         useNewUrlParser: true,
+    //         useUnifiedTopology: true
+    //     }
+    // },
 
     // Configuración de autenticación
     auth: {

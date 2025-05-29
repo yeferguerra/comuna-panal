@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/styles.css">
+    <!-- Agregamos Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-blue-50">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -23,41 +25,179 @@
                     </a>
                 </p>
             </div>
-            <form id="registerForm" class="mt-8 space-y-6">
-                <div class="rounded-md shadow-sm -space-y-px">
+            <form id="registerForm" class="mt-8 space-y-6" novalidate>
+                <!-- Token CSRF oculto -->
+                <input type="hidden" id="csrfToken" name="_csrf">
+                
+                <div class="space-y-4">
+                    <!-- Tipo de Registro -->
                     <div>
-                        <label for="nombre" class="sr-only">Nombre completo</label>
-                        <input id="nombre" name="nombre" type="text" required 
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-sky-500 focus:border-sky-500 focus:z-10 sm:text-sm" 
-                            placeholder="Nombre completo">
+                        <label for="tipoRegistro" class="block text-sm font-medium text-gray-700">Tipo de Registro</label>
+                        <div class="mt-1 relative">
+                            <select id="tipoRegistro" name="tipoRegistro" required
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm pr-8">
+                                <option value="nueva">Soy jefe de familia - Crear nueva familia</option>
+                                <option value="existente">Ya soy parte de una familia</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="email" class="sr-only">Correo electrónico</label>
-                        <input id="email" name="email" type="email" required 
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-sky-500 focus:border-sky-500 focus:z-10 sm:text-sm" 
-                            placeholder="Correo electrónico">
+
+                    <!-- Identificador Familiar (inicialmente oculto) -->
+                    <div id="identificadorFamiliarContainer" class="hidden">
+                        <label for="identificadorFamiliar" class="block text-sm font-medium text-gray-700">Identificador Familiar</label>
+                        <div class="mt-1 relative">
+                            <input id="identificadorFamiliar" name="identificadorFamiliar" type="text"
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                placeholder="Ingresa el identificador de tu familia"
+                                pattern="[A-Z0-9]{8}"
+                                minlength="8"
+                                maxlength="8"
+                                aria-describedby="identificador-error">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-users text-gray-400"></i>
+                            </div>
+                        </div>
+                        <p id="identificador-error" class="mt-2 text-sm text-red-600 hidden"></p>
+                        <p class="mt-2 text-sm text-gray-500">
+                            El identificador familiar es un código único de 8 caracteres que te proporcionó el jefe de tu familia
+                        </p>
                     </div>
+
+                    <!-- Nombre -->
                     <div>
-                        <label for="password" class="sr-only">Contraseña</label>
-                        <input id="password" name="password" type="password" required 
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-sky-500 focus:border-sky-500 focus:z-10 sm:text-sm" 
-                            placeholder="Contraseña">
+                        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                        <div class="mt-1 relative">
+                            <input id="nombre" name="nombre" type="text" required 
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                placeholder="Ingresa tu nombre"
+                                pattern="[A-Za-zÀ-ÿ\s]{2,25}"
+                                minlength="2"
+                                maxlength="25"
+                                aria-describedby="nombre-error">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                        </div>
+                        <p id="nombre-error" class="mt-2 text-sm text-red-600 hidden"></p>
                     </div>
+
+                    <!-- Apellido -->
                     <div>
-                        <label for="confirmPassword" class="sr-only">Confirmar contraseña</label>
-                        <input id="confirmPassword" name="confirmPassword" type="password" required 
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-sky-500 focus:border-sky-500 focus:z-10 sm:text-sm" 
-                            placeholder="Confirmar contraseña">
+                        <label for="apellido" class="block text-sm font-medium text-gray-700">Apellido</label>
+                        <div class="mt-1 relative">
+                            <input id="apellido" name="apellido" type="text" required 
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                placeholder="Ingresa tu apellido"
+                                pattern="[A-Za-zÀ-ÿ\s]{2,25}"
+                                minlength="2"
+                                maxlength="25"
+                                aria-describedby="apellido-error">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                        </div>
+                        <p id="apellido-error" class="mt-2 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <!-- Cédula -->
+                    <div>
+                        <label for="cedula">Cédula de Identidad Venezolana:</label>
+                        <input type="text" id="cedula" name="cedula" pattern="[VE]-\d+" placeholder="V-12345678" required>
+                    </div>
+
+                    <!-- Correo electrónico -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+                        <div class="mt-1 relative">
+                            <input id="email" name="email" type="email" required 
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                placeholder="ejemplo@correo.com"
+                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                aria-describedby="email-error">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </div>
+                        </div>
+                        <p id="email-error" class="mt-2 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                        <div class="mt-1 relative">
+                            <input id="password" name="password" type="password" required 
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                placeholder="Mínimo 8 caracteres"
+                                minlength="8"
+                                aria-describedby="password-error password-strength">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="password-strength" class="mt-2 h-2 rounded-full bg-gray-200">
+                            <div class="h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p id="password-error" class="mt-2 text-sm text-red-600 hidden"></p>
+                        <p class="mt-2 text-sm text-gray-500">
+                            La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales.
+                        </p>
+                    </div>
+
+                    <!-- Confirmar contraseña -->
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
+                        <div class="mt-1 relative">
+                            <input id="confirmPassword" name="confirmPassword" type="password" required 
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                placeholder="Repite tu contraseña"
+                                aria-describedby="confirm-password-error">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <button type="button" id="toggleConfirmPassword" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p id="confirm-password-error" class="mt-2 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <!-- Fecha de Nacimiento -->
+                    <div>
+                        <label for="fechaNacimiento" class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+                        <div class="mt-1 relative">
+                            <input id="fechaNacimiento" name="fechaNacimiento" type="date" required 
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                aria-describedby="fechaNacimiento-error"
+                                max="">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calendar-alt text-gray-400"></i>
+                            </div>
+                        </div>
+                        <p id="fechaNacimiento-error" class="mt-2 text-sm text-red-600 hidden"></p>
                     </div>
                 </div>
 
+                <!-- Términos y condiciones -->
+                <div class="flex items-center">
+                    <input id="terms" name="terms" type="checkbox" required
+                        class="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+                        aria-describedby="terms-error">
+                    <label for="terms" class="ml-2 block text-sm text-gray-900">
+                        Acepto los <a href="#" class="text-sky-600 hover:text-sky-500">términos y condiciones</a>
+                    </label>
+                </div>
+                <p id="terms-error" class="mt-2 text-sm text-red-600 hidden"></p>
+
                 <div>
                     <button type="submit" 
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        id="submitButton">
                         <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                            <svg class="h-5 w-5 text-sky-500 group-hover:text-sky-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                            </svg>
+                            <i class="fas fa-user-plus text-sky-500 group-hover:text-sky-400"></i>
                         </span>
                         Registrar
                     </button>
@@ -66,50 +206,404 @@
 
             <div class="text-center mt-4">
                 <a href="/" class="text-sm text-sky-600 hover:text-sky-500">
-                    ← Volver al inicio
+                    <i class="fas fa-arrow-left mr-1"></i> Volver al inicio
                 </a>
             </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Función para validar la contraseña
+        function validatePassword(password) {
+            const minLength = 8;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumbers = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
             
-            const nombre = document.getElementById('nombre').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+            let strength = 0;
+            if (password.length >= minLength) strength += 25;
+            if (hasUpperCase) strength += 25;
+            if (hasLowerCase) strength += 25;
+            if (hasNumbers) strength += 12.5;
+            if (hasSpecialChar) strength += 12.5;
+            
+            return {
+                isValid: password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar,
+                strength: strength
+            };
+        }
 
-            if (password !== confirmPassword) {
-                alert('Las contraseñas no coinciden');
+        // Función para actualizar el indicador de fortaleza de contraseña
+        function updatePasswordStrength(password) {
+            const strengthBar = document.querySelector('#password-strength div');
+            const validation = validatePassword(password);
+            
+            strengthBar.style.width = `${validation.strength}%`;
+            
+            if (validation.strength < 50) {
+                strengthBar.className = 'h-full rounded-full transition-all duration-300 bg-red-500';
+            } else if (validation.strength < 75) {
+                strengthBar.className = 'h-full rounded-full transition-all duration-300 bg-yellow-500';
+            } else {
+                strengthBar.className = 'h-full rounded-full transition-all duration-300 bg-green-500';
+            }
+        }
+
+        // Función para mostrar/ocultar contraseña
+        function togglePasswordVisibility(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(buttonId);
+            const icon = button.querySelector('i');
+            
+            button.addEventListener('click', () => {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        // Función para mostrar error
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+        }
+
+        // Función para ocultar error
+        function hideError(elementId) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.classList.add('hidden');
+        }
+
+        // Función para validar cédula venezolana
+        function validateCedula(tipo, numero) {
+            // Verificar que el tipo sea válido
+            if (!['V', 'E'].includes(tipo)) {
+                return false;
+            }
+
+            // Verificar que el número tenga la longitud correcta
+            if (numero.length !== 8) {
+                return false;
+            }
+
+            // Verificar que el número solo contenga dígitos
+            if (!/^\d+$/.test(numero)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Función para generar identificador familiar
+        function generarIdentificadorFamiliar() {
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let identificador = '';
+            for (let i = 0; i < 8; i++) {
+                identificador += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            return identificador;
+        }
+
+        // Inicializar funcionalidades
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('registerForm');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const submitButton = document.getElementById('submitButton');
+            const tipoCedulaSelect = document.getElementById('tipoCedula');
+            const numeroCedulaInput = document.getElementById('numeroCedula');
+            const tipoRegistroSelect = document.getElementById('tipoRegistro');
+            const identificadorFamiliarContainer = document.getElementById('identificadorFamiliarContainer');
+            const identificadorFamiliarInput = document.getElementById('identificadorFamiliar');
+            const fechaNacimientoInput = document.getElementById('fechaNacimiento');
+
+            // Establecer la fecha máxima para el campo de fecha de nacimiento (hoy)
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Enero es 0
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayFormatted = `${yyyy}-${mm}-${dd}`;
+            fechaNacimientoInput.setAttribute('max', todayFormatted);
+
+            // Inicializar toggle de contraseñas
+            togglePasswordVisibility('password', 'togglePassword');
+            togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword');
+
+            // Validación en tiempo real de la contraseña
+            passwordInput.addEventListener('input', (e) => {
+                updatePasswordStrength(e.target.value);
+                hideError('password-error');
+            });
+
+            // Validación en tiempo real de confirmación de contraseña
+            confirmPasswordInput.addEventListener('input', (e) => {
+                if (e.target.value !== passwordInput.value) {
+                    showError('confirm-password-error', 'Las contraseñas no coinciden');
+                } else {
+                    hideError('confirm-password-error');
+                }
+            });
+
+            // Formatear número de cédula mientras se escribe
+            numeroCedulaInput.addEventListener('input', (e) => {
+                // Solo permitir números
+                let value = e.target.value.replace(/\D/g, '');
+                
+                // Limitar a 8 dígitos
+                if (value.length > 8) {
+                    value = value.slice(0, 8);
+                }
+                
+                e.target.value = value;
+                hideError('cedula-error');
+            });
+
+            // Manejar cambio en tipo de registro
+            tipoRegistroSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'existente') {
+                    identificadorFamiliarContainer.classList.remove('hidden');
+                    identificadorFamiliarInput.required = true;
+                } else {
+                    identificadorFamiliarContainer.classList.add('hidden');
+                    identificadorFamiliarInput.required = false;
+                }
+            });
+
+            // Manejo del envío del formulario
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                let isValid = true;
+
+                // Validar nombre
+                const nombre = document.getElementById('nombre').value;
+                if (!nombre.match(/^[A-Za-zÀ-ÿ\s]{2,25}$/)) {
+                    showError('nombre-error', 'El nombre debe contener solo letras y espacios (2-25 caracteres)');
+                    isValid = false;
+                }
+
+                // Validar apellido
+                const apellido = document.getElementById('apellido').value;
+                if (!apellido.match(/^[A-Za-zÀ-ÿ\s]{2,25}$/)) {
+                    showError('apellido-error', 'El apellido debe contener solo letras y espacios (2-25 caracteres)');
+                    isValid = false;
+                }
+
+                // Validar cédula
+                const tipoCedula = tipoCedulaSelect.value;
+                const numeroCedula = numeroCedulaInput.value;
+                if (!validateCedula(tipoCedula, numeroCedula)) {
+                    showError('cedula-error', 'Por favor, ingresa una cédula válida');
+                    isValid = false;
+                }
+
+                // Validar email
+                const email = document.getElementById('email').value;
+                if (!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+                    showError('email-error', 'Por favor, ingresa un correo electrónico válido');
+                    isValid = false;
+                }
+
+                // Validar contraseña
+                const password = passwordInput.value;
+                const passwordValidation = validatePassword(password);
+                if (!passwordValidation.isValid) {
+                    showError('password-error', 'La contraseña no cumple con los requisitos mínimos');
+                    isValid = false;
+                }
+
+                // Validar confirmación de contraseña
+                if (password !== confirmPasswordInput.value) {
+                    showError('confirm-password-error', 'Las contraseñas no coinciden');
+                    isValid = false;
+                }
+
+                // Validar Fecha de Nacimiento y edad
+                const fechaNacimiento = new Date(fechaNacimientoInput.value);
+                const today = new Date();
+                const age = today.getFullYear() - fechaNacimiento.getFullYear();
+                const monthDiff = today.getMonth() - fechaNacimiento.getMonth();
+                
+                // Ajuste por si aún no ha cumplido años en el mes actual
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < fechaNacimiento.getDate())) {
+                    age--;
+                }
+
+                const tipoRegistro = tipoRegistroSelect.value;
+
+                if (fechaNacimientoInput.value === '') {
+                    showError('fechaNacimiento-error', 'Debes ingresar tu fecha de nacimiento.');
+                    isValid = false;
+                } else if (age < 5) {
+                    showError('fechaNacimiento-error', 'Debes tener al menos 5 años para registrarte.');
+                    isValid = false;
+                } else if (tipoRegistro === 'nueva' && age < 18) {
+                    showError('fechaNacimiento-error', 'Debes tener al menos 18 años para registrar una nueva familia.');
+                    isValid = false;
+                } else {
+                    hideError('fechaNacimiento-error');
+                }
+
+                // Validar términos y condiciones
+                if (!document.getElementById('terms').checked) {
+                    showError('terms-error', 'Debes aceptar los términos y condiciones');
+                    isValid = false;
+                }
+
+                // Validar identificador familiar si es necesario
+                if (tipoRegistroSelect.value === 'existente') {
+                    const identificador = identificadorFamiliarInput.value;
+                    if (!identificador.match(/^[A-Z0-9]{8}$/)) {
+                        showError('identificador-error', 'El identificador familiar debe tener 8 caracteres alfanuméricos');
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) {
+                    return;
+                }
+
+                // Deshabilitar el botón durante el envío
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Registrando...';
+
+                try {
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': document.getElementById('csrfToken').value
+                        },
+                        body: JSON.stringify({ 
+                            nombre, 
+                            apellido,
+                            cedula: `${tipoCedula}-${numeroCedula}`,
+                            email, 
+                            password,
+                            tipoRegistro: tipoRegistroSelect.value,
+                            identificadorFamiliar: tipoRegistro === 'existente' ? identificadorFamiliarInput.value : undefined,
+                            fechaNacimiento: fechaNacimientoInput.value
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Error en el registro');
+                    }
+
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
+                    
+                    // Mostrar mensaje con el identificador familiar si es nuevo registro
+                    if (tipoRegistroSelect.value === 'nueva') {
+                        alert(`¡Registro exitoso! Tu identificador familiar es: ${data.identificadorFamiliar}\n\nGuarda este código, lo necesitarás para agregar más miembros a tu familia.`);
+                    }
+                    
+                    window.location.href = '/familiares.html';
+                } catch (error) {
+                    alert(error.message || 'Error al registrar. Por favor, intenta nuevamente.');
+                    console.error('Error:', error);
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Registrar';
+                }
+            });
+        });
+
+        // Nuevo script para manejar la visibilidad de la cédula basado en la edad
+        const fechaNacimientoInput = document.getElementById('fechaNacimiento');
+        const cedulaGroup = document.querySelector('label[for="cedula"]').parentElement; // Contenedor del label y input de cédula
+        const cedulaInput = document.getElementById('cedula');
+
+        function calcularEdad(fecha) {
+            const hoy = new Date();
+            const nacimiento = new Date(fecha);
+            let edad = hoy.getFullYear() - nacimiento.getFullYear();
+            const mesDiferencia = hoy.getMonth() - nacimiento.getMonth();
+            if (mesDiferencia < 0 || (mesDiferencia === 0 && hoy.getDate() < nacimiento.getDate())) {
+                edad--;
+            }
+            return edad;
+        }
+
+        function manejarVisibilidadCedula() {
+            const fechaStr = fechaNacimientoInput.value;
+            if (fechaStr) {
+                const edad = calcularEdad(fechaStr);
+                if (edad < 10) {
+                    cedulaGroup.style.display = 'none';
+                    cedulaInput.required = false; // Hacer no requerido en el frontend
+                    cedulaInput.value = ''; // Limpiar valor
+                } else {
+                    cedulaGroup.style.display = ''; // O 'block' o flex, dependiendo del layout
+                    cedulaInput.required = true; // Hacer requerido
+                }
+            } else {
+                // Si no hay fecha, mostrar el campo de cédula por defecto (o según la lógica inicial)
+                cedulaGroup.style.display = '';
+                cedulaInput.required = true;
+            }
+        }
+
+        // Establecer la fecha máxima en el calendario a hoy
+        const today = new Date().toISOString().split('T')[0];
+        fechaNacimientoInput.setAttribute('max', today);
+
+        // Añadir listener para cuando cambie la fecha
+        fechaNacimientoInput.addEventListener('change', manejarVisibilidadCedula);
+
+        // Ejecutar al cargar la página para el valor inicial si lo hay
+        manejarVisibilidadCedula();
+
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const fechaStr = fechaNacimientoInput.value;
+            if (fechaStr) {
+                const edad = calcularEdad(fechaStr);
+
+                if (edad < 5) {
+                    alert('Debes tener al menos 5 años para registrarte.');
+                    event.preventDefault(); // Prevenir el envío del formulario
+                    return;
+                }
+
+                const tipoRegistroSelect = document.getElementById('tipoRegistro');
+                const tipoRegistro = tipoRegistroSelect.value;
+
+                if (tipoRegistro === 'nueva' && edad < 18) {
+                     alert('Debes tener al menos 18 años para registrar una nueva familia.');
+                     event.preventDefault(); // Prevenir el envío del formulario
+                     return;
+                }
+                 // Si la cédula está visible (edad >= 10), validar que tenga un valor
+                 if (cedulaGroup.style.display !== 'none' && cedulaInput.required && !cedulaInput.value) {
+                     alert('La cédula de identidad es obligatoria para mayores de 10 años.');
+                     event.preventDefault();
+                     return;
+                 }
+                 // Si el tipo de registro es existente y el campo de identificador está visible, validar que tenga un valor
+                const identificadorFamiliarInput = document.getElementById('identificadorFamiliar');
+                const identificadorFamiliarGroup = identificadorFamiliarInput.parentElement;
+                 if (tipoRegistro === 'existente' && identificadorFamiliarGroup.style.display !== 'none' && !identificadorFamiliarInput.value) {
+                     alert('Debes ingresar el identificador familiar para unirte a una familia existente.');
+                     event.preventDefault();
+                     return;
+                 }
+
+            } else {
+                // Si la fecha de nacimiento no está puesta, prevenir envío y avisar
+                alert('Por favor, ingresa tu fecha de nacimiento.');
+                event.preventDefault();
                 return;
             }
 
-            try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ nombre, email, password })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error en el registro');
-                }
-
-                const data = await response.json();
-                
-                // Guardar el token en localStorage
-                localStorage.setItem('token', data.token);
-                
-                // Redirigir a la página de gestión de familiares
-                window.location.href = '/familiares.html';
-            } catch (error) {
-                alert('Error al registrar. Por favor, intenta nuevamente.');
-                console.error('Error:', error);
-            }
+            // Si todo está bien, el formulario se enviará
         });
     </script>
 </body>
