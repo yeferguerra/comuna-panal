@@ -6,6 +6,7 @@ const config = require('./config/config');
 const mongoose = require('mongoose');
 const winston = require('winston');
 const authRoutes = require('./routes/authRoutes');
+const familiarRoutes = require('./routes/familiarRoutes');
 
 // Cargar variables de entorno
 dotenv.config();
@@ -39,6 +40,7 @@ mongoose.connect(config.database.url, config.database.options)
 
 // Rutas
 app.use('/api/auth', authRoutes);
+app.use('/api/familiares', familiarRoutes);
 
 // Rutas estáticas
 app.get('/', (req, res) => {

@@ -12,7 +12,7 @@
 </head>
 <body class="bg-blue-50 text-gray-800">
 
-    <nav class="bg-red-700 p-4 shadow-md relative" style="background: none;">
+    <nav class="bg-sky-800 p-4 shadow-md relative" style="background: none;">
         <div class="navbar-bg absolute left-0 top-0 w-full h-[370px] md:h-[420px] z-0"></div>
         <div class="container mx-auto flex flex-col items-center justify-center relative z-10 h-[370px] md:h-[420px]">
             <div class="flex flex-col items-center justify-center w-full h-full">
@@ -44,7 +44,7 @@
                             </a>
                     </li>
                     <li>
-                            <a href="#acceder" class="flex items-center justify-center gap-2 px-2 py-1 border border-gray-300 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 btn-hover-scale-lg">
+                            <a href="#acceder" id="nav-auth-link" class="flex items-center justify-center gap-2 px-2 py-1 border border-gray-300 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 btn-hover-scale-lg">
                                 <span class="bg-blue-200 p-1 rounded-lg flex items-center justify-center hidden lg:flex">
                                     <img src="/assets/icons/icono_acceder.png" alt="Acceder / Registrarse" class="w-4 h-4">
                                 </span>
@@ -93,21 +93,21 @@
         <div class="container mx-auto text-center p-6 rounded-lg shadow-xl fade-in-up hero-text-container-hover">
             <h1 class="text-4xl md:text-6xl font-bold mb-4 hero-title">Bienvenido/a a la Comuna El Panal 2021</h1>
             <p class="text-lg md:text-2xl mb-8">Un espacio digital para la organización y el bienestar de nuestra comunidad.</p>
-            <a href="#acceder" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 md:py-3 px-4 md:px-8 rounded-lg text-base md:text-lg shadow hover:shadow-lg transition duration-300 transform hover:scale-105 inline-block">Únete o Inicia Sesión</a>
+            <a href="#acceder" id="hero-auth-button" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 md:py-3 px-4 md:px-8 rounded-lg text-base md:text-lg shadow hover:shadow-lg transition duration-300 transform hover:scale-105 inline-block">Únete o Inicia Sesión</a>
         </div>
     </header>
 
     <main class="container mx-auto -mt-8 mb-12">
-        <section id="bienvenida" class="bg-gradient-to-br from-yellow-400 via-blue-500 to-red-600 p-8 rounded-lg shadow-lg mb-10 animated-gradient">
+        <section id="bienvenida" class="bg-gradient-to-br from-sky-400 via-cyan-500 to-blue-600 p-8 rounded-lg shadow-lg mb-10 animated-gradient">
             <div class="bg-white/90 backdrop-blur-sm p-8 rounded-lg">
-            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">¡Construyendo Juntos Nuestra Comuna!</h2>
+            <h2 class="text-3xl font-semibold text-blue-800 mb-6 text-center">¡Construyendo Juntos Nuestra Comuna!</h2>
                 <div class="max-w-3xl mx-auto">
                     <div class="relative">
-                        <h2 class="text-3xl font-semibold text-red-700 mb-4 text-center">¡Conecta Directamente con tu Gobierno Comunal!</h2>
+                        <h2 class="text-3xl font-semibold text-blue-800 mb-4 text-center">¡Conecta Directamente con tu Gobierno Comunal!</h2>
                         <p class="text-gray-700 leading-relaxed mb-6 text-center text-lg">
                             Bienvenido/a al portal interactivo de la Comuna Socialista El Panal 2021, tu puente directo con el Gobierno Comunal desde el corazón de la parroquia 23 de Enero, Caracas.
                         </p>
-                        <h3 class="text-2xl font-semibold text-red-600 mb-4">Esta plataforma innovadora te empodera para:</h3>
+                        <h3 class="text-2xl font-semibold text-cyan-700 mb-4">Esta plataforma innovadora te empodera para:</h3>
                         <ul class="list-disc list-inside text-gray-700 leading-relaxed text-lg space-y-2">
                             <li>Registrar y mantener actualizado el censo de tu núcleo familiar.</li>
                             <li>Reportar de manera ágil y sencilla las necesidades o problemas de tu hogar y sector.</li>
@@ -122,28 +122,40 @@
             </div>
         </section>
 
-        <section id="acceder" class="bg-gray-50 p-8 rounded-lg shadow-lg mb-10">
+        <section id="acceder" class="bg-blue-50 p-8 rounded-lg shadow-lg mb-10">
             <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Acceso al Sistema</h2>
             <div class="max-w-md mx-auto">
                 <p class="text-gray-700 leading-relaxed mb-4 text-center">
-                    Próximamente aquí encontrarás los formularios para iniciar sesión si ya tienes una cuenta, o para registrar a tu núcleo familiar por primera vez.
+                    Inicia sesión para acceder a todas las funcionalidades del sistema, incluyendo la gestión de tu núcleo familiar.
                 </p>
-                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                    <a href="/login.html" class="bg-red-700 hover:bg-red-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 w-full sm:w-auto text-center">
+                <div id="auth-buttons" class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="/login.html" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 w-full sm:w-auto text-center">
                         Iniciar Sesión
                     </a>
-                    <a href="/register.html" class="bg-yellow-500 hover:bg-yellow-600 text-red-800 font-bold py-3 px-6 rounded-lg transition duration-300 w-full sm:w-auto text-center">
+                    <a href="/register.html" class="bg-sky-500 hover:bg-sky-600 text-blue-800 font-bold py-3 px-6 rounded-lg transition duration-300 w-full sm:w-auto text-center">
                         Registrar Familia
                     </a>
+                </div>
+                <div id="userMenu" class="hidden mt-6 text-center">
+                    <p class="text-gray-700 mb-4">Bienvenido/a, <span id="userName" class="font-semibold"></span></p>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="/familiares.html" class="flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                            <img src="/assets/icons/icono_familia.svg" alt="Gestión de Familiares" class="w-5 h-5">
+                            Gestión de Familiares
+                        </a>
+                        <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                            Cerrar Sesión
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="noticias" class="bg-white p-8 rounded-lg shadow-lg mb-10">
-            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Noticias de la Comuna</h2>
+        <section id="noticias" class="bg-blue-100 p-8 rounded-lg shadow-lg mb-10">
+            <h2 class="text-3xl font-semibold text-blue-800 mb-6 text-center">Noticias de la Comuna</h2>
             <div class="space-y-6">
                 <article class="news-item">
-                    <h3 class="text-xl font-semibold text-red-600 mb-2">Jornada de Vacunación Exitosa en el Sector A</h3>
+                    <h3 class="text-xl font-semibold text-blue-700 mb-2">Jornada de Vacunación Exitosa en el Sector A</h3>
                     <p class="text-sm text-gray-500 mb-2">Publicado: 25 de Mayo, 2024</p>
                     <p class="text-gray-700 leading-relaxed">
                         El pasado fin de semana se llevó a cabo una jornada de vacunación contra la influenza y el COVID-19 en el ambulatorio del Sector A, beneficiando a más de 200 vecinos y vecinas. Agradecemos la participación de la comunidad y el apoyo de las brigadas de salud.
@@ -151,7 +163,7 @@
                     <a href="#" class="text-yellow-600 hover:text-yellow-700 font-medium">Leer más...</a>
                 </article>
                 <article class="news-item">
-                    <h3 class="text-xl font-semibold text-red-600 mb-2">Avances en la Rehabilitación de la Cancha Deportiva</h3>
+                    <h3 class="text-xl font-semibold text-blue-700 mb-2">Avances en la Rehabilitación de la Cancha Deportiva</h3>
                     <p class="text-sm text-gray-500 mb-2">Publicado: 22 de Mayo, 2024</p>
                     <p class="text-gray-700 leading-relaxed">
                         Los trabajos de rehabilitación de la cancha deportiva múltiple avanzan a buen ritmo. Ya se ha completado la reparación del cercado perimetral y la pintura de las gradas. Próximamente se iniciará la demarcación de la cancha.
@@ -159,7 +171,7 @@
                     <a href="#" class="text-yellow-600 hover:text-yellow-700 font-medium">Leer más...</a>
                 </article>
                 <article class="news-item">
-                    <h3 class="text-xl font-semibold text-red-600 mb-2">Convocatoria a Asamblea General de Ciudadanos y Ciudadanas</h3>
+                    <h3 class="text-xl font-semibold text-blue-700 mb-2">Convocatoria a Asamblea General de Ciudadanos y Ciudadanas</h3>
                     <p class="text-sm text-gray-500 mb-2">Publicado: 20 de Mayo, 2024</p>
                     <p class="text-gray-700 leading-relaxed">
                         Se convoca a todos los habitantes de la Comuna El Panal 2021 a la Asamblea General que se realizará el próximo Sábado 1 de Junio a las 3:00 PM en la Casa Comunal. Puntos a tratar: presupuesto participativo y elección de nuevos voceros. ¡Tu asistencia es crucial!
@@ -169,25 +181,25 @@
             </div>
         </section>
 
-        <section id="eventos" class="bg-gray-50 p-8 rounded-lg shadow-lg mb-10">
-            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Próximos Eventos</h2>
+        <section id="eventos" class="bg-blue-50 p-8 rounded-lg shadow-lg mb-10">
+            <h2 class="text-3xl font-semibold text-blue-800 mb-6 text-center">Próximos Eventos</h2>
             <div class="space-y-6">
                 <div class="event-item">
-                    <h3 class="text-xl font-semibold text-red-600 mb-1">Asamblea General de Ciudadanos</h3>
+                    <h3 class="text-xl font-semibold text-blue-700 mb-1">Asamblea General de Ciudadanos</h3>
                     <p class="text-gray-700"><strong class="font-medium">Fecha:</strong> Sábado, 01 de Junio de 2024</p>
                     <p class="text-gray-700"><strong class="font-medium">Hora:</strong> 3:00 PM</p>
                     <p class="text-gray-700"><strong class="font-medium">Lugar:</strong> Casa Comunal</p>
                     <p class="text-gray-600 mt-1">Discusión sobre presupuesto participativo y elección de voceros.</p>
                 </div>
                 <div class="event-item">
-                    <h3 class="text-xl font-semibold text-red-600 mb-1">Feria Agroalimentaria Comunal</h3>
+                    <h3 class="text-xl font-semibold text-blue-700 mb-1">Feria Agroalimentaria Comunal</h3>
                     <p class="text-gray-700"><strong class="font-medium">Fecha:</strong> Sábado, 08 de Junio de 2024</p>
                     <p class="text-gray-700"><strong class="font-medium">Hora:</strong> 8:00 AM - 2:00 PM</p>
                     <p class="text-gray-700"><strong class="font-medium">Lugar:</strong> Plaza Central de la Comuna</p>
                     <p class="text-gray-600 mt-1">Venta de productos frescos a precios solidarios, directamente del productor al consumidor.</p>
                 </div>
                 <div class="event-item">
-                    <h3 class="text-xl font-semibold text-red-600 mb-1">Taller de Formación en Huertos Urbanos</h3>
+                    <h3 class="text-xl font-semibold text-blue-700 mb-1">Taller de Formación en Huertos Urbanos</h3>
                     <p class="text-gray-700"><strong class="font-medium">Fecha:</strong> Miércoles, 12 de Junio de 2024</p>
                     <p class="text-gray-700"><strong class="font-medium">Hora:</strong> 9:00 AM</p>
                     <p class="text-gray-700"><strong class="font-medium">Lugar:</strong> Espacio Socioproductivo "Manos a la Siembra"</p>
@@ -196,8 +208,8 @@
             </div>
         </section>
 
-        <section id="nosotros" class="bg-white p-8 rounded-lg shadow-lg mb-10">
-            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Sobre El Panal 2021</h2>
+        <section id="nosotros" class="bg-blue-100 p-8 rounded-lg shadow-lg mb-10">
+            <h2 class="text-3xl font-semibold text-blue-800 mb-6 text-center">Sobre El Panal 2021</h2>
             <div class="grid md:grid-cols-2 gap-8 items-center">
                 <div>
                     <p class="text-gray-700 leading-relaxed mb-4">
@@ -213,8 +225,8 @@
             </div>
         </section>
 
-         <section id="contacto" class="bg-gray-50 p-8 rounded-lg shadow-lg">
-            <h2 class="text-3xl font-semibold text-red-700 mb-6 text-center">Contacto</h2>
+         <section id="contacto" class="bg-blue-50 p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-semibold text-blue-800 mb-6 text-center">Contacto</h2>
             <p class="text-gray-700 leading-relaxed mb-4 text-center">
                 Para más información o asistencia, puedes contactar a la vocería de tu consejo comunal o acercarte a la casa comunal.
             </p>
@@ -224,12 +236,110 @@
         </section>
     </main>
 
-    <footer class="bg-red-800 text-white p-6 text-center mt-12">
+    <footer class="bg-blue-800 text-white p-6 text-center mt-12">
         <p>&copy; 2024-2025 Comuna Socialista El Panal 2021. Todos los derechos reservados.</p>
         <p>Desarrollado para el pueblo y por el pueblo.</p>
     </footer>
 
     <script src="/js/scripts.js"></script>
+    <script>
+        // Verificar si el usuario está autenticado
+        async function checkAuth() {
+            const token = localStorage.getItem('token');
+            const userMenu = document.getElementById('userMenu');
+            const authButtons = document.getElementById('auth-buttons');
+            const userNameSpan = document.getElementById('userName');
+            const navAuthLink = document.getElementById('nav-auth-link');
+            const heroAuthButton = document.getElementById('hero-auth-button');
+
+            const welcomeMessage = document.createElement('p');
+            welcomeMessage.classList.add('text-green-600', 'leading-relaxed', 'mb-4', 'text-center', 'font-semibold');
+
+            if (token) {
+                try {
+                    const response = await fetch('/api/auth/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Token inválido');
+                    }
+
+                    const user = await response.json();
+                    
+                    // Ocultar botones de login/register en la sección principal
+                    if (authButtons) {
+                        authButtons.classList.add('hidden');
+                    }
+
+                    // Ocultar enlace en la barra de navegación
+                    if (navAuthLink) {
+                        navAuthLink.classList.add('hidden');
+                    }
+
+                    // Ocultar botón en el hero banner
+                    if (heroAuthButton) {
+                        heroAuthButton.classList.add('hidden');
+                    }
+
+                    // Mostrar el menú de usuario (Perfil y Cerrar Sesión)
+                    userMenu.classList.remove('hidden');
+                    
+                    // Mostrar el primer nombre del usuario en el menú de usuario
+                    const firstName = user.nombre.split(' ')[0];
+                    userNameSpan.textContent = firstName;
+
+                    // Mostrar mensaje de bienvenida temporal
+                    welcomeMessage.textContent = `¡Bienvenido de vuelta, ${firstName}!`;
+                    const accederSection = document.getElementById('acceder');
+                    if (accederSection) {
+                        accederSection.prepend(welcomeMessage);
+                        setTimeout(() => {
+                            welcomeMessage.remove();
+                        }, 5000);
+                    }
+
+                } catch (error) {
+                    console.error('Error al obtener datos del usuario:', error);
+                    localStorage.removeItem('token');
+                    // Asegurar que los botones de login/register y enlaces estén visibles
+                    if (authButtons) {
+                        authButtons.classList.remove('hidden');
+                    }
+                    if (navAuthLink) {
+                        navAuthLink.classList.remove('hidden');
+                    }
+                    if (heroAuthButton) {
+                        heroAuthButton.classList.remove('hidden');
+                    }
+                    userMenu.classList.add('hidden');
+                }
+            } else {
+                // Si no hay token, asegurar que los botones de login/register y enlaces estén visibles y el menú de usuario esté oculto
+                if (authButtons) {
+                    authButtons.classList.remove('hidden');
+                }
+                if (navAuthLink) {
+                    navAuthLink.classList.remove('hidden');
+                }
+                if (heroAuthButton) {
+                    heroAuthButton.classList.remove('hidden');
+                }
+                userMenu.classList.add('hidden');
+            }
+        }
+
+        // Función para cerrar sesión
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.reload(); 
+        }
+
+        // Verificar autenticación al cargar la página
+        checkAuth();
+    </script>
 
 </body>
 </html>

@@ -12,4 +12,9 @@ router.get('/profile', auth, authController.getProfile);
 router.patch('/profile', auth, authController.updateProfile);
 router.post('/logout', auth, authController.logout);
 
+// @route   GET api/auth/me
+// @desc    Get user data by token
+// @access  Private
+router.get('/me', auth, authController.getUser);
+
 module.exports = router; 

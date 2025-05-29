@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Familiares - Comuna Panal</title>
+    <!-- Enlace a Normalize.css -->
+    <link rel="stylesheet" href="/css/normalize.css">
+    <!-- Enlace a tus estilos principales -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Enlace a Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+<body class="bg-gray-100">
+
+    <!-- Aquí irá el contenido principal de la gestión de familiares -->
+    <div class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Gestión de Familiares</h1>
+        
+        <!-- Formulario para añadir/editar familiar -->
+        <form id="familiarForm" class="mb-6 p-4 border rounded-lg">
+            <input type="hidden" id="familiarId">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="nombre" class="block text-gray-700">Nombre:</label>
+                    <input type="text" id="nombre" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div>
+                    <label for="apellido" class="block text-gray-700">Apellido:</label>
+                    <input type="text" id="apellido" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div>
+                    <label for="parentesco" class="block text-gray-700">Parentesco:</label>
+                    <input type="text" id="parentesco" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+                <div>
+                    <label for="edad" class="block text-gray-700">Edad:</label>
+                    <input type="number" id="edad" class="w-full px-3 py-2 border rounded-lg" required>
+                </div>
+            </div>
+            <div class="mt-4 text-right">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Añadir Familiar</button>
+                <button type="button" id="cancelEdit" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 hidden">Cancelar Edición</button>
+            </div>
+        </form>
+
+        <!-- Tabla para mostrar familiares -->
+        <div>
+            <h2 class="text-xl font-bold mb-4">Listado de Familiares</h2>
+            <table id="familiaresTable" class="min-w-full bg-white border rounded-lg">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b">Nombre</th>
+                        <th class="py-2 px-4 border-b">Apellido</th>
+                        <th class="py-2 px-4 border-b">Parentesco</th>
+                        <th class="py-2 px-4 border-b">Edad</th>
+                        <th class="py-2 px-4 border-b">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Las filas de familiares se cargarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Enlace a tu script de familiares -->
+    <script src="/js/familiares.js"></script>
+</body>
+</html> 

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const config = require('../config/config');
+const bcrypt = require('bcrypt');
 
 // Generar token JWT
 const generateToken = (userId) => {
@@ -12,22 +13,28 @@ const generateToken = (userId) => {
 // Registrar nuevo usuario
 const register = async (req, res) => {
     try {
-        const { nombre, apellido, email, password, direccion, telefono } = req.body;
+        const { email, password, nombre, apellido, direccion, telefono } = req.body;
 
         // Verificar si el usuario ya existe
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'El correo electrónico ya está registrado' });
+            return res.status(400).json({ error: 'El correo electrónico ya está registrado.' });
         }
+
+        // --- Lógica para asignar rol de superadmin al primer usuario ---
+        const userCount = await User.countDocuments();
+        const role = userCount === 0 ? 'superadmin' : 'usuario'; // Asigna 'superadmin' si no hay usuarios, de lo contrario 'usuario'
+        // --------------------------------------------------------
 
         // Crear nuevo usuario
         const user = new User({
-            nombre,
-            apellido,
             email,
             password,
+            nombre,
+            apellido,
             direccion,
-            telefono
+            telefono,
+            rol: role // Asigna el rol determinado por la lógica
         });
 
         await user.save();
@@ -36,19 +43,17 @@ const register = async (req, res) => {
         const token = generateToken(user._id);
 
         res.status(201).json({
-            message: 'Usuario registrado exitosamente',
-            token,
             user: {
                 id: user._id,
                 nombre: user.nombre,
                 apellido: user.apellido,
                 email: user.email,
-                rol: user.rol
-            }
+                rol: user.rol // Devuelve el rol asignado
+            },
+            token
         });
     } catch (error) {
-        console.error('Error en registro:', error);
-        res.status(500).json({ message: 'Error al registrar usuario' });
+        res.status(500).json({ error: 'Error al registrar usuario.' });
     }
 };
 
@@ -57,53 +62,34 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Buscar usuario
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Credenciales inválidas' });
+            return res.status(400).json({ message: 'Credenciales inválidas' });
         }
 
-        // Verificar contraseña
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Credenciales inválidas' });
+            return res.status(400).json({ message: 'Credenciales inválidas' });
         }
 
-        // Actualizar último acceso
-        user.ultimoAcceso = new Date();
-        await user.save();
+        const token = jwt.sign({ id: user._id, role: user.rol }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // Generar token
-        const token = generateToken(user._id);
-
-        res.json({
-            message: 'Inicio de sesión exitoso',
-            token,
-            user: {
-                id: user._id,
-                nombre: user.nombre,
-                apellido: user.apellido,
-                email: user.email,
-                rol: user.rol
-            }
-        });
+        res.json({ token });
     } catch (error) {
-        console.error('Error en login:', error);
-        res.status(500).json({ message: 'Error al iniciar sesión' });
+        res.status(500).json({ message: 'Error del servidor' });
     }
 };
 
 // Obtener perfil del usuario
 const getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId).select('-password');
-        if (!user) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
+        const user = await User.findById(req.user._id)
+            .select('-password')
+            .populate('familiares');
+
         res.json(user);
     } catch (error) {
-        console.error('Error al obtener perfil:', error);
-        res.status(500).json({ message: 'Error al obtener perfil' });
+        res.status(500).json({ error: 'Error al obtener perfil.' });
     }
 };
 
@@ -145,10 +131,24 @@ const logout = async (req, res) => {
     }
 };
 
+const getUser = async (req, res) => {
+    try {
+        // El usuario autenticado está disponible en req.user gracias al middleware de autenticación
+        const user = await User.findById(req.user.id).select('-password'); // Excluir la contraseña
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error del servidor' });
+    }
+};
+
 module.exports = {
     register,
     login,
     getProfile,
     updateProfile,
-    logout
+    logout,
+    getUser
 }; 
