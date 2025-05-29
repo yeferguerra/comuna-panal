@@ -25,6 +25,24 @@
                     </a>
                 </p>
             </div>
+
+            <div class="mt-4">
+                <a href="/api/auth/google" 
+                    class="w-full flex justify-center items-center gap-2 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                    <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5">
+                    Registrarse con Google
+                </a>
+            </div>
+
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">O regístrate con tu correo</span>
+                </div>
+            </div>
+
             <form id="registerForm" class="mt-8 space-y-6" novalidate>
                 <!-- Token CSRF oculto -->
                 <input type="hidden" id="csrfToken" name="_csrf">
@@ -102,10 +120,54 @@
                         <p id="apellido-error" class="mt-2 text-sm text-red-600 hidden"></p>
                     </div>
 
-                    <!-- Cédula -->
+                    <!-- Fecha de Nacimiento -->
                     <div>
-                        <label for="cedula">Cédula de Identidad Venezolana:</label>
-                        <input type="text" id="cedula" name="cedula" pattern="[VE]-\d+" placeholder="V-12345678" required>
+                        <label for="fechaNacimiento" class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+                        <div class="mt-1 relative">
+                            <input id="fechaNacimiento" name="fechaNacimiento" type="date" required 
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                aria-describedby="fechaNacimiento-error"
+                                max="">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calendar-alt text-gray-400"></i>
+                            </div>
+                        </div>
+                        <p id="fechaNacimiento-error" class="mt-2 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <!-- Cédula -->
+                    <div id="cedulaContainer" style="display: none;">
+                        <label class="block text-sm font-medium text-gray-700">Cédula de Identidad Venezolana</label>
+                        <div class="mt-1 flex space-x-2">
+                            <!-- Selector de tipo de cédula -->
+                            <div class="w-1/4 relative">
+                                <select id="tipoCedula" name="tipoCedula" required
+                                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm pr-8">
+                                    <option value="V">V</option>
+                                    <option value="E">E</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                    <i class="fas fa-chevron-down text-gray-400"></i>
+                                </div>
+                            </div>
+                            <!-- Campo de número de cédula -->
+                            <div class="w-3/4 relative">
+                                <input id="numeroCedula" name="numeroCedula" type="text" required 
+                                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                    placeholder="12345678"
+                                    pattern="\d{7,8}"
+                                    minlength="7"
+                                    maxlength="8"
+                                    aria-describedby="cedula-error">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-id-card text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="cedula-error" class="mt-2 text-sm text-red-600 hidden"></p>
+                        <p class="mt-2 text-sm text-gray-500">
+                            Selecciona el tipo y ingresa el número de tu cédula
+                        </p>
                     </div>
 
                     <!-- Correo electrónico -->
@@ -163,21 +225,6 @@
                             </div>
                         </div>
                         <p id="confirm-password-error" class="mt-2 text-sm text-red-600 hidden"></p>
-                    </div>
-
-                    <!-- Fecha de Nacimiento -->
-                    <div>
-                        <label for="fechaNacimiento" class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
-                        <div class="mt-1 relative">
-                            <input id="fechaNacimiento" name="fechaNacimiento" type="date" required 
-                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-                                aria-describedby="fechaNacimiento-error"
-                                max="">
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                <i class="fas fa-calendar-alt text-gray-400"></i>
-                            </div>
-                        </div>
-                        <p id="fechaNacimiento-error" class="mt-2 text-sm text-red-600 hidden"></p>
                     </div>
                 </div>
 
@@ -312,8 +359,53 @@
             return identificador;
         }
 
-        // Inicializar funcionalidades
+        // Función para obtener parámetros de la URL
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Función para manejar datos de Google
+        function handleGoogleData() {
+            const googleData = getUrlParameter('google_data');
+            if (googleData) {
+                try {
+                    const userData = JSON.parse(googleData);
+                    // Rellenar los campos del formulario con los datos de Google
+                    document.getElementById('nombre').value = userData.nombre || '';
+                    document.getElementById('apellido').value = userData.apellido || '';
+                    document.getElementById('email').value = userData.email || '';
+                    
+                    // Deshabilitar el campo de email ya que viene de Google
+                    document.getElementById('email').readOnly = true;
+                    
+                    // Mostrar mensaje informativo
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'bg-blue-50 border-l-4 border-blue-400 p-4 mb-4';
+                    infoDiv.innerHTML = `
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    ¡Oops! Parece que aún no tienes cuenta. No te preocupes, vamos a tomarnos unos momentos para crearla.
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    document.querySelector('form').insertBefore(infoDiv, document.querySelector('form').firstChild);
+                } catch (error) {
+                    console.error('Error al procesar datos de Google:', error);
+                }
+            }
+        }
+
+        // Ejecutar al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
+            handleGoogleData();
             const form = document.getElementById('registerForm');
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirmPassword');
@@ -396,12 +488,15 @@
                     isValid = false;
                 }
 
-                // Validar cédula
-                const tipoCedula = tipoCedulaSelect.value;
-                const numeroCedula = numeroCedulaInput.value;
-                if (!validateCedula(tipoCedula, numeroCedula)) {
-                    showError('cedula-error', 'Por favor, ingresa una cédula válida');
-                    isValid = false;
+                // Validar cédula solo si es visible y requerida
+                const cedulaContainer = document.getElementById('cedulaContainer');
+                if (cedulaContainer.style.display !== 'none') {
+                    const tipoCedula = document.getElementById('tipoCedula').value;
+                    const numeroCedula = document.getElementById('numeroCedula').value;
+                    if (!validateCedula(tipoCedula, numeroCedula)) {
+                        showError('cedula-error', 'Por favor, ingresa una cédula válida');
+                        isValid = false;
+                    }
                 }
 
                 // Validar email
@@ -484,7 +579,7 @@
                         body: JSON.stringify({ 
                             nombre, 
                             apellido,
-                            cedula: `${tipoCedula}-${numeroCedula}`,
+                            cedula: cedulaContainer.style.display !== 'none' ? `${tipoCedula}-${numeroCedula}` : null,
                             email, 
                             password,
                             tipoRegistro: tipoRegistroSelect.value,
@@ -535,20 +630,27 @@
 
         function manejarVisibilidadCedula() {
             const fechaStr = fechaNacimientoInput.value;
+            const cedulaContainer = document.getElementById('cedulaContainer');
+            const tipoCedula = document.getElementById('tipoCedula');
+            const numeroCedula = document.getElementById('numeroCedula');
+
             if (fechaStr) {
                 const edad = calcularEdad(fechaStr);
                 if (edad < 10) {
-                    cedulaGroup.style.display = 'none';
-                    cedulaInput.required = false; // Hacer no requerido en el frontend
-                    cedulaInput.value = ''; // Limpiar valor
+                    cedulaContainer.style.display = 'none';
+                    tipoCedula.required = false;
+                    numeroCedula.required = false;
+                    tipoCedula.value = '';
+                    numeroCedula.value = '';
                 } else {
-                    cedulaGroup.style.display = ''; // O 'block' o flex, dependiendo del layout
-                    cedulaInput.required = true; // Hacer requerido
+                    cedulaContainer.style.display = '';
+                    tipoCedula.required = true;
+                    numeroCedula.required = true;
                 }
             } else {
-                // Si no hay fecha, mostrar el campo de cédula por defecto (o según la lógica inicial)
-                cedulaGroup.style.display = '';
-                cedulaInput.required = true;
+                cedulaContainer.style.display = 'none';
+                tipoCedula.required = false;
+                numeroCedula.required = false;
             }
         }
 
@@ -562,6 +664,7 @@
         // Ejecutar al cargar la página para el valor inicial si lo hay
         manejarVisibilidadCedula();
 
+        // Modificar el manejo del envío del formulario para validar la cédula solo si es visible
         document.querySelector('form').addEventListener('submit', function(event) {
             const fechaStr = fechaNacimientoInput.value;
             if (fechaStr) {
@@ -569,7 +672,7 @@
 
                 if (edad < 5) {
                     alert('Debes tener al menos 5 años para registrarte.');
-                    event.preventDefault(); // Prevenir el envío del formulario
+                    event.preventDefault();
                     return;
                 }
 
@@ -577,33 +680,36 @@
                 const tipoRegistro = tipoRegistroSelect.value;
 
                 if (tipoRegistro === 'nueva' && edad < 18) {
-                     alert('Debes tener al menos 18 años para registrar una nueva familia.');
-                     event.preventDefault(); // Prevenir el envío del formulario
-                     return;
+                    alert('Debes tener al menos 18 años para registrar una nueva familia.');
+                    event.preventDefault();
+                    return;
                 }
-                 // Si la cédula está visible (edad >= 10), validar que tenga un valor
-                 if (cedulaGroup.style.display !== 'none' && cedulaInput.required && !cedulaInput.value) {
-                     alert('La cédula de identidad es obligatoria para mayores de 10 años.');
-                     event.preventDefault();
-                     return;
-                 }
-                 // Si el tipo de registro es existente y el campo de identificador está visible, validar que tenga un valor
+
+                // Validar cédula solo si el usuario tiene 10 años o más
+                const cedulaContainer = document.getElementById('cedulaContainer');
+                if (edad >= 10 && cedulaContainer.style.display !== 'none') {
+                    const tipoCedula = document.getElementById('tipoCedula').value;
+                    const numeroCedula = document.getElementById('numeroCedula').value;
+                    if (!tipoCedula || !numeroCedula) {
+                        alert('La cédula de identidad es obligatoria para mayores de 10 años.');
+                        event.preventDefault();
+                        return;
+                    }
+                }
+
+                // Validar identificador familiar si es necesario
                 const identificadorFamiliarInput = document.getElementById('identificadorFamiliar');
                 const identificadorFamiliarGroup = identificadorFamiliarInput.parentElement;
-                 if (tipoRegistro === 'existente' && identificadorFamiliarGroup.style.display !== 'none' && !identificadorFamiliarInput.value) {
-                     alert('Debes ingresar el identificador familiar para unirte a una familia existente.');
-                     event.preventDefault();
-                     return;
-                 }
-
+                if (tipoRegistro === 'existente' && identificadorFamiliarGroup.style.display !== 'none' && !identificadorFamiliarInput.value) {
+                    alert('Debes ingresar el identificador familiar para unirte a una familia existente.');
+                    event.preventDefault();
+                    return;
+                }
             } else {
-                // Si la fecha de nacimiento no está puesta, prevenir envío y avisar
                 alert('Por favor, ingresa tu fecha de nacimiento.');
                 event.preventDefault();
                 return;
             }
-
-            // Si todo está bien, el formulario se enviará
         });
     </script>
 </body>

@@ -3,10 +3,13 @@ const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
 const config = require('./config/config');
-const mongoose = require('mongoose');
 const winston = require('winston');
 const authRoutes = require('./routes/authRoutes');
 const familiarRoutes = require('./routes/familiarRoutes');
+const db = require('./config/db');
+const passport = require('passport');
+const session = require('express-session');
+require('./config/passport'); // Importar la configuración de Passport
 
 // Cargar variables de entorno
 dotenv.config();
@@ -27,16 +30,32 @@ const logger = winston.createLogger({
 // Inicialización de la aplicación
 const app = express();
 
+// Configuración de sesiones
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'comuna_el_panal_2021_super_secreta_123',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // Cambiar a true en producción con HTTPS
+        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    }
+}));
+
+// Middleware para logging de sesiones
+app.use((req, res, next) => {
+    console.log('Sesión actual:', req.session);
+    next();
+});
+
+// Inicializar Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Conexión a la base de datos
-mongoose.connect(config.database.url, config.database.options)
-    .then(() => logger.info('Conexión a MongoDB establecida'))
-    .catch(err => logger.error('Error al conectar con MongoDB:', err));
 
 // Rutas
 app.use('/api/auth', authRoutes);
@@ -44,12 +63,13 @@ app.use('/api/familiares', familiarRoutes);
 
 // Rutas estáticas
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Manejo de errores
 app.use((err, req, res, next) => {
-    logger.error(err.stack);
+    logger.error('Error en la aplicación:', err);
+    console.error('Error detallado:', err);
     res.status(500).json({ error: '¡Algo salió mal!' });
 });
 

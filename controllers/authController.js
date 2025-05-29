@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const bcrypt = require('bcrypt');
 const db = require('../config/db'); // Importar el pool de conexiones a MySQL
+const passport = require('passport');
 
 // Generar token JWT
 const generateToken = (userId) => {
@@ -57,7 +58,7 @@ const register = async (req, res) => {
         }
 
         // Validar si el usuario ya existe por email o cédula (solo si tiene 10 años o más)
-        let existingUserQuery = 'SELECT id FROM usuarios WHERE email = ?';
+        let existingUserQuery = 'SELECT id, email, cedula FROM usuarios WHERE email = ?';
         let queryParams = [email];
 
         if (age >= 10 && cedula) {
@@ -70,7 +71,18 @@ const register = async (req, res) => {
         if (existingUser.length > 0) {
             await connection.rollback();
             connection.release();
-            return res.status(400).json({ error: 'El correo electrónico o la cédula ya están registrados.' });
+            
+            // Verificar específicamente qué campo está duplicado
+            const emailExists = existingUser.some(user => user.email === email);
+            const cedulaExists = age >= 10 && cedula && existingUser.some(user => user.cedula === cedula);
+            
+            if (emailExists && cedulaExists) {
+                return res.status(400).json({ error: 'El correo electrónico y la cédula ya están registrados.' });
+            } else if (emailExists) {
+                return res.status(400).json({ error: 'El correo electrónico ya está registrado.' });
+            } else if (cedulaExists) {
+                return res.status(400).json({ error: 'La cédula ya está registrada.' });
+            }
         }
 
         // Hashear la contraseña
@@ -273,11 +285,23 @@ const getUser = async (req, res) => {
 
 // La función logout en general no interactúa con la base de datos en este enfoque (solo manejo de token en frontend)
 
+// Rutas de autenticación con Google
+const googleAuth = passport.authenticate('google', {
+    scope: ['profile', 'email']
+});
+
+const googleCallback = passport.authenticate('google', {
+    failureRedirect: '/login',
+    successRedirect: '/dashboard'
+});
+
 module.exports = {
     register,
     login,
     // getProfile, // Comentadas por ahora, requerirán revisión
     // updateProfile, // Comentadas por ahora, requerirán revisión
     // logout, // Comentada por ahora, requerirá revisión
-    getUser
+    getUser,
+    googleAuth,
+    googleCallback
 };

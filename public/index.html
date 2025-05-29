@@ -248,98 +248,55 @@
             const token = localStorage.getItem('token');
             const userMenu = document.getElementById('userMenu');
             const authButtons = document.getElementById('auth-buttons');
-            const userNameSpan = document.getElementById('userName');
             const navAuthLink = document.getElementById('nav-auth-link');
             const heroAuthButton = document.getElementById('hero-auth-button');
 
-            const welcomeMessage = document.createElement('p');
-            welcomeMessage.classList.add('text-green-600', 'leading-relaxed', 'mb-4', 'text-center', 'font-semibold');
-
             if (token) {
                 try {
-                    const response = await fetch('/api/auth/me', {
+                    const response = await fetch('/api/auth/user', {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
 
-                    if (!response.ok) {
-                        throw new Error('Token inválido');
-                    }
-
-                    const user = await response.json();
-                    
-                    // Ocultar botones de login/register en la sección principal
-                    if (authButtons) {
+                    if (response.ok) {
+                        const userData = await response.json();
+                        document.getElementById('userName').textContent = userData.nombre;
+                        userMenu.classList.remove('hidden');
                         authButtons.classList.add('hidden');
-                    }
-
-                    // Ocultar enlace en la barra de navegación
-                    if (navAuthLink) {
-                        navAuthLink.classList.add('hidden');
-                    }
-
-                    // Ocultar botón en el hero banner
-                    if (heroAuthButton) {
-                        heroAuthButton.classList.add('hidden');
-                    }
-
-                    // Mostrar el menú de usuario (Perfil y Cerrar Sesión)
-                    userMenu.classList.remove('hidden');
-                    
-                    // Mostrar el primer nombre del usuario en el menú de usuario
-                    const firstName = user.nombre.split(' ')[0];
-                    userNameSpan.textContent = firstName;
-
-                    // Mostrar mensaje de bienvenida temporal
-                    welcomeMessage.textContent = `¡Bienvenido de vuelta, ${firstName}!`;
-                    const accederSection = document.getElementById('acceder');
-                    if (accederSection) {
-                        accederSection.prepend(welcomeMessage);
-                        setTimeout(() => {
-                            welcomeMessage.remove();
-                        }, 5000);
-                    }
-
-                } catch (error) {
-                    console.error('Error al obtener datos del usuario:', error);
-                    localStorage.removeItem('token');
-                    // Asegurar que los botones de login/register y enlaces estén visibles
-                    if (authButtons) {
+                        if (navAuthLink) navAuthLink.classList.add('hidden');
+                        if (heroAuthButton) heroAuthButton.classList.add('hidden');
+                    } else {
+                        localStorage.removeItem('token');
+                        userMenu.classList.add('hidden');
                         authButtons.classList.remove('hidden');
+                        if (navAuthLink) navAuthLink.classList.remove('hidden');
+                        if (heroAuthButton) heroAuthButton.classList.remove('hidden');
                     }
-                    if (navAuthLink) {
-                        navAuthLink.classList.remove('hidden');
-                    }
-                    if (heroAuthButton) {
-                        heroAuthButton.classList.remove('hidden');
-                    }
+                } catch (error) {
+                    console.error('Error al verificar autenticación:', error);
+                    localStorage.removeItem('token');
                     userMenu.classList.add('hidden');
+                    authButtons.classList.remove('hidden');
+                    if (navAuthLink) navAuthLink.classList.remove('hidden');
+                    if (heroAuthButton) heroAuthButton.classList.remove('hidden');
                 }
             } else {
-                // Si no hay token, asegurar que los botones de login/register y enlaces estén visibles y el menú de usuario esté oculto
-                if (authButtons) {
-                    authButtons.classList.remove('hidden');
-                }
-                if (navAuthLink) {
-                    navAuthLink.classList.remove('hidden');
-                }
-                if (heroAuthButton) {
-                    heroAuthButton.classList.remove('hidden');
-                }
                 userMenu.classList.add('hidden');
+                authButtons.classList.remove('hidden');
+                if (navAuthLink) navAuthLink.classList.remove('hidden');
+                if (heroAuthButton) heroAuthButton.classList.remove('hidden');
             }
         }
 
         // Función para cerrar sesión
         function logout() {
             localStorage.removeItem('token');
-            window.location.reload(); 
+            window.location.href = '/';
         }
 
         // Verificar autenticación al cargar la página
-        checkAuth();
+        document.addEventListener('DOMContentLoaded', checkAuth);
     </script>
-
 </body>
-</html>
+</html> 
