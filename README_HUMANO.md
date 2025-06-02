@@ -1,1 +1,100 @@
-# Comuna Socialista El Panal 2021\n\n## Descripción del Proyecto\n\nEste proyecto es una plataforma digital para la gestión y comunicación de la Comuna Socialista El Panal 2021, ubicada en la parroquia 23 de Enero, Caracas. El objetivo es facilitar la organización comunal, el registro de familias, la comunicación de noticias y eventos, y la gestión de solicitudes ciudadanas.\n\nActualmente, el proyecto se encuentra en desarrollo temprano, enfocándose en la estructura básica del frontend y un backend inicial para la autenticación de usuarios y la gestión de familiares.\n\n## Estado Actual del Proyecto\n\nHemos establecido la estructura fundamental tanto en el frontend como en el backend, integrando la interfaz de usuario con una base de datos MongoDB.\n\n### Frontend (Directorio `public/`)\n\n*   **Página Principal (`index.html`):** Estructura base con secciones (Hero Banner, Bienvenida, Acceso al Sistema, Noticias, Eventos, Sobre Nosotros, Contacto) y navegación principal.\n*   **Estilos (CSS):** Separados en `public/css/styles.css` (estilos personalizados) y `public/css/normalize.css` (reseteo básico). Uso de TailwindCSS para utilidades de estilo.\n*   **Scripts (JavaScript):** Separados en `public/js/scripts.js` (scripts generales) y `public/js/familiares.js` (lógica para la gestión de familiares). El script en `index.html` maneja la lógica de autenticación básica en el lado del cliente.\n*   **Páginas de Autenticación:**\n    *   `public/login.html`: Página simple para inicio de sesión.\n    *   `public/register.html`: Página simple para registro de nuevas familias/usuarios.\n    *   **Página de Gestión de Familiares (`public/familiares.html`):** Estructura básica para mostrar y gestionar miembros familiares.\n*   **Gestión de Autenticación en Frontend:** El script en `index.html` verifica la existencia de un token JWT en `localStorage`. Si existe, oculta los botones/enlaces de acceso/registro en la página principal (barra de navegación, hero banner y sección de \"Acceso al Sistema\") y muestra un menú de usuario con el nombre del usuario (obtenido del backend) y opciones como \"Gestión de Familiares\" y \"Cerrar Sesión\". Muestra un mensaje de bienvenida temporal después de iniciar sesión.\n*   **Assets:** Imágenes (`public/assets/images/`) e iconos (`public/assets/icons/`) utilizados en el frontend.\n\n### Backend\n\n*   **Servidor:** Montado con Node.js y Express (`server.js`).\n*   **Base de Datos:** Conexión a MongoDB utilizando Mongoose.\n*   **Modelos:**\n    *   `models/User.js`: Esquema para usuarios con campos como email, password, nombre, apellido, dirección, teléfono, rol (implementado lógica para asignar `superadmin` al primer usuario).\n    *   `models/Familiar.js`: Esquema básico para miembros familiares (asociado a un usuario).\n*   **Controladores (`controllers/`):** Lógica para manejar las peticiones:\n    *   `authController.js`: Funciones para registro (`register`), inicio de sesión (`login`) y obtención de datos del usuario autenticado (`getUser`).\n    *   `familiarController.js`: Funciones CRUD (Crear, Leer, Actualizar, Eliminar) básicas para familiares.\n*   **Rutas (`routes/`):** Definición de endpoints de la API:\n    *   `authRoutes.js`: Rutas para autenticación (`/api/auth/register`, `/api/auth/login`, `/api/auth/me`). La ruta `/me` está protegida.\n    *   `familiarRoutes.js`: Rutas para la gestión de familiares (`/api/familiares`). Estas rutas están protegidas por el middleware de autenticación.\n*   **Middleware (`middleware/auth.js`):** Middleware para verificar el token JWT y proteger rutas.\n*   **Configuración (`config/config.js`):** Archivo de configuración (por ahora básico).\n*   **Variables de Entorno:** Uso de archivo `.env` para variables sensibles (puerto, URL de DB, JWT Secret, etc.). Existe un `.env.example` como guía.\n\n### Herramientas Adicionales\n\n*   **Git:** Control de versiones.\n*   **GitHub:** Repositorio remoto para alojar el código.\n*   **nodemon:** Para reiniciar automáticamente el servidor durante el desarrollo.\n*   **bcrypt:** Para el hasheo seguro de contraseñas.\n*   **jsonwebtoken (jwt):** Para la autenticación basada en tokens.\n\n## Estructura del Proyecto\n\n```\ncomuna-panal/\n├── controllers/\n│   ├── authController.js\n│   └── familiarController.js\n├── middleware/\n│   └── auth.js\n├── models/\n│   ├── Familiar.js\n│   └── User.js\n├── public/\n│   ├── assets/\n│   │   ├── icons/\n│   │   └── images/\n│   ├── css/\n│   │   ├── normalize.css\n│   │   └── styles.css\n│   ├── js/\n│   │   ├── familiares.js\n│   │   └── scripts.js\n│   ├── familiares.html\n│   ├── index.html\n│   ├── login.html\n│   └── register.html\n├── routes/\n│   ├── authRoutes.js\n│   └── familiarRoutes.js\n├── .env.example\n├── .gitignore\n├── package.json\n├── README.md\n└── server.js\n```\n\n## Configuración e Instalación\n\nSigue estos pasos para poner el proyecto en funcionamiento localmente:\n\n1.  Clona el repositorio de GitHub:\n    ```bash\n    git clone https://github.com/tu-usuario/comuna-panal.git\n    ```\n2.  Navega al directorio del proyecto:\n    ```bash\n    cd comuna-panal\n    ```\n3.  Instala las dependencias del proyecto:\n    ```bash\n    npm install\n    ```\n    *(Asegúrate de tener Node.js y npm instalados en tu sistema)*\n4.  Crea un archivo `.env` en la raíz del proyecto basado en `.env.example`. Completa las variables de entorno necesarias (especialmente `DATABASE_URL` si usas MongoDB Atlas o una URL local, `JWT_SECRET`, etc.). Ejemplo:\n    ```env\n    PORT=3000\n    HOST=localhost\n    DATABASE_URL=mongodb://localhost:27017/comuna-panal\n    JWT_SECRET=superclaveultrasecreta\n    LOG_LEVEL=info\n    ```\n    *(Si usas MongoDB local, asegúrate de que tu servidor MongoDB esté corriendo)*\n5.  Inicia el servidor de desarrollo:\n    ```bash\n    npm run dev\n    ```\n    *(Esto usa nodemon para reiniciar el servidor automáticamente con los cambios)*\n6.  Abre tu navegador y ve a `http://localhost:3000` para ver la aplicación.\n\n## Próximos Pasos (Lista de Tareas)\n\nAquí hay una lista de tareas pendientes para continuar desarrollando el proyecto. Puedes ir marcando las casillas \[[x]] a medida que se completen:\n\n*   **Backend:**\n    *   \[ ] Implementar completamente la lógica CRUD en `familiarController.js` para interactuar con la base de datos.\n    *   \[ ] Agregar validación de datos en las rutas y controladores (usando librerías como Joi o Express-validator).\n    *   \[ ] Implementar manejo de errores más robusto en el backend.\n    *   \[ ] Agregar lógica para la gestión de Noticias y Eventos (modelos, controladores, rutas).\n    *   \[ ] Considerar roles y permisos más detallados (por ejemplo, ¿quién puede gestionar familiares, noticias, eventos?).\n    *   \[ ] Implementar funcionalidad de \"Olvidaste tu contraseña?\".\n    *   \[ ] Implementar cierre de sesión en el backend (invalidación de token si se implementa así).\n*   **Frontend:**\n    *   \[ ] Desarrollar la interfaz completa y la lógica en `public/familiares.html` y `public/js/familiares.js` para mostrar, agregar, editar y eliminar familiares, interactuando con el backend.\n    *   \[ ] Implementar la visualización de Noticias en `index.html` (posiblemente obteniéndolas del backend).\n    *   \[ ] Implementar la visualización de Eventos en `index.html` (posiblemente obteniéndolos del backend).\n    *   \[ ] Agregar formularios frontend para agregar/editar Noticias y Eventos (probablemente en páginas de administración separadas).\n    *   \[ ] Mejorar la interfaz de usuario y la experiencia del usuario en general.\n    *   \[ ] Implementar validación en los formularios frontend.\n    *   \[ ] Mostrar mensajes de éxito/error más amigables al usuario.\n*   **General:**\n    *   \[ ] Escribir pruebas (unitarias, de integración) para el backend y/o frontend.\n    *   \[ ] Implementar logging más detallado si es necesario.\n    *   \[ ] Configurar un pipeline de CI/CD para despliegue automático.\n    *   \[ ] Considerar la seguridad: protección contra ataques comunes (XSS, CSRF, inyección SQL/NoSQL), políticas CORS, etc.\n\n## Contribuciones\n\n¡Las contribuciones son bienvenidas! Si deseas contribuir, por favor, haz un fork del repositorio, crea una rama para tu funcionalidad (`git checkout -b feature/nueva-funcionalidad`), realiza tus cambios, haz commit (`git commit -m 'feat: agregar nueva funcionalidad'`), push a tu fork (`git push origin feature/nueva-funcionalidad`) y abre un Pull Request.\n\n## Licencia\n\n[Especificar tipo de licencia, si aplica]\n\n---\n\n*Este README ha sido generado automáticamente y puede ser actualizado a medida que el proyecto evoluciona.* 
+# Comuna Socialista El Panal
+
+## 🏠 Acerca del Proyecto
+
+La Comuna Socialista El Panal es una plataforma digital diseñada para fortalecer la organización comunal y mejorar la comunicación entre los habitantes de la parroquia 23 de Enero en Caracas. Nuestro objetivo es facilitar la gestión de familias, la difusión de noticias y eventos, y la atención de solicitudes ciudadanas.
+
+## ✨ Características Principales
+
+- **Registro de Familias**: Sistema completo para registrar y gestionar las familias de la comunidad
+- **Autenticación Segura**: Inicio de sesión rápido y seguro usando tu cuenta de Google
+- **Gestión de Roles**: Sistema de roles que permite una organización eficiente de la comunidad
+- **Noticias y Eventos**: Plataforma para mantener informada a la comunidad sobre actividades y noticias importantes
+- **Solicitudes Ciudadanas**: Sistema para gestionar y dar seguimiento a las solicitudes de los habitantes
+
+## 🚀 Cómo Empezar
+
+### Para Habitantes de la Comunidad
+
+1. **Accede al Sistema**
+   - Visita nuestra página web
+   - Haz clic en "Iniciar Sesión con Google"
+   - Autoriza el acceso a tu cuenta de Google
+
+2. **Registra tu Familia**
+   - Una vez dentro del sistema, podrás registrar tu familia
+   - Proporciona la información básica requerida
+   - Asigna roles a los miembros de tu familia
+
+3. **Explora las Funcionalidades**
+   - Revisa las noticias y eventos de la comunidad
+   - Participa en las actividades programadas
+   - Realiza solicitudes cuando lo necesites
+
+### Para Administradores
+
+1. **Acceso al Panel de Control**
+   - Inicia sesión con tu cuenta de administrador
+   - Accede al panel de control desde el menú principal
+
+2. **Gestión de Contenido**
+   - Publica noticias y eventos
+   - Gestiona las solicitudes ciudadanas
+   - Administra los registros de familias
+
+3. **Reportes y Estadísticas**
+   - Visualiza estadísticas de la comunidad
+   - Genera reportes de actividades
+   - Monitorea el uso del sistema
+
+## 📱 Características Técnicas
+
+- **Interfaz Responsiva**: Accesible desde cualquier dispositivo
+- **Navegación Intuitiva**: Diseño centrado en el usuario
+- **Seguridad Avanzada**: Protección de datos personales
+- **Actualizaciones en Tiempo Real**: Información siempre actualizada
+
+## 🤝 Contribuciones
+
+¡Tu participación es importante! Puedes contribuir de varias formas:
+
+- Reportando errores o sugerencias
+- Participando en las pruebas de usuario
+- Compartiendo ideas para nuevas funcionalidades
+- Ayudando a otros usuarios
+
+## 📞 Soporte
+
+Si necesitas ayuda o tienes preguntas:
+
+- Consulta nuestra sección de preguntas frecuentes
+- Contacta al equipo de soporte
+- Visita nuestro centro de ayuda
+
+## �� Próximas Mejoras
+
+Estamos trabajando constantemente para mejorar la plataforma. Algunas de las mejoras planificadas incluyen:
+
+*   **Nuevas Funcionalidades:**
+    *   \[ ] Gestión completa de familiares (agregar, editar, eliminar).
+    *   \[ ] Módulos dedicados para Noticias y Eventos comunitarios.
+    *   \[ ] Funcionalidad para que los miembros soliciten unirse a una familia existente.
+    *   \[ ] Herramientas para gestionar solicitudes pendientes de unirse a familias.
+
+*   **Mejoras Técnicas y de Rendimiento:**
+    *   \[ ] Mayor seguridad y protección de tus datos.
+    *   \[ ] Sistema más estable y con mejor manejo de errores.
+    *   \[ ] Optimización del rendimiento para que la plataforma sea más rápida.
+    *   \[ ] Preparación para soportar un mayor número de usuarios (escalabilidad).
+    *   \[ ] Documentación técnica detallada para futuros desarrolladores.
+    *   \[ ] Implementación de pruebas automatizadas para garantizar que los cambios no afecten el funcionamiento existente.
+    *   \[ ] Sistemas de respaldo automático de la base de datos.
+    *   \[ ] Posible desarrollo de una aplicación móvil en el futuro.
+
+## 📄 Licencia
+
+Este proyecto es de uso exclusivo para la Comuna Socialista El Panal y sus habitantes.
+
+---
+
+*Última actualización: [Fecha]* 

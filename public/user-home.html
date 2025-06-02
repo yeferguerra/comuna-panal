@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Usuario - Comuna Panal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/normalize.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <nav class="bg-sky-800 p-4 text-white shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-lg font-bold">Comuna El Panal 2021</a>
+            <div>
+                <span id="userNameDisplay" class="mr-4">Cargando...</span>
+                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-md text-sm">Cerrar Sesión</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-8 p-4">
+        <h1 class="text-3xl font-bold mb-6">Bienvenido a tu Espacio Comunal</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Panel de Información del Usuario -->
+            <div class="md:col-span-1 bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Tu Perfil</h2>
+                <p><strong>Nombre:</strong> <span id="profileName"></span></p>
+                <p><strong>Apellido:</strong> <span id="profileApellido"></span></p>
+                <p><strong>Correo:</strong> <span id="profileEmail"></span></p>
+                <p id="profileCedula" class="hidden"><strong>Cédula:</strong> <span></span></p>
+                <p id="profileIdentificador" class="mt-4 hidden"><strong>Identificador Familiar:</strong> <span class="font-mono text-lg text-sky-700"></span></p>
+                <p id="profileRol" class="mt-2 hidden"><strong>Rol en la Familia:</strong> <span></span></p>
+                
+                <!-- Aquí podrías agregar un botón para editar perfil -->
+            </div>
+
+            <!-- Contenido Principal (Noticias, Eventos, Solicitudes, etc.) -->
+            <div class="md:col-span-2 space-y-6">
+                <!-- Sección de Noticias (Placeholder) -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4">Noticias Recientes</h2>
+                    <p>Contenido de noticias de la comuna...</p>
+                    <!-- Lista de noticias -->
+                </div>
+
+                <!-- Sección de Eventos (Placeholder) -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4">Próximos Eventos</h2>
+                    <p>Contenido de próximos eventos...</p>
+                    <!-- Lista de eventos -->
+                </div>
+
+                <!-- Sección de Solicitudes Pendientes (Placeholder) -->
+                 <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4">Mis Solicitudes</h2>
+                    <p>Listado de solicitudes del usuario o familia...</p>
+                    <!-- Lista de solicitudes -->
+                </div>
+
+                <!-- Aquí podrías agregar otras secciones -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadUserData() {
+            console.log('loadUserData: Función iniciada.'); // Log
+            const urlParams = new URLSearchParams(window.location.search);
+            const tokenFromUrl = urlParams.get('token');
+            console.log('loadUserData: tokenFromUrl:', tokenFromUrl); // Log
+            let storedToken = localStorage.getItem('authToken');
+            console.log('loadUserData: storedToken:', storedToken); // Log
+
+            let tokenToUse = null;
+
+            // Priorizar token de la URL si existe (viene después de login/registro)
+            console.log('loadUserData: Verificando tokenFromUrl...'); // Log
+            if (tokenFromUrl) {
+                console.log('loadUserData: tokenFromUrl encontrado. Guardando en localStorage y usando.'); // Log
+                localStorage.setItem('authToken', tokenFromUrl);
+                tokenToUse = tokenFromUrl;
+                console.log('loadUserData: tokenToUse después de URL:', tokenToUse); // Log
+                // Limpiar URL para remover el token (opcional pero recomendado)
+                // history.replaceState({}, document.title, window.location.pathname);
+                // Comentamos temporalmente el replaceState para ver la URL completa si es necesario
+            } else if (storedToken) {
+                // Usar token de localStorage si no hay token en la URL
+                console.log('loadUserData: No hay tokenFromUrl, usando storedToken.'); // Log
+                tokenToUse = storedToken;
+                console.log('loadUserData: tokenToUse después de localStorage:', tokenToUse); // Log
+            }
+
+            console.log('loadUserData: Finalizando verificación. tokenToUse:', tokenToUse); // Log final
+
+            // Si no hay token en URL ni en localStorage, redirigir a login
+            if (!tokenToUse) {
+                console.log('No hay token, redirigiendo a login...'); // Log para debugging
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Si tenemos un token, intentar cargar datos del usuario
+            try {
+                // Cargar datos del usuario
+                const userResponse = await fetch('/api/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${tokenToUse}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!userResponse.ok) {
+                    // Token inválido, redirigir a login
+                    console.error('Error en la respuesta de /api/auth/me:', userResponse.status, userResponse.statusText);
+                    const errorBody = await userResponse.text(); // Intentar leer el cuerpo del error si existe
+                    console.error('Cuerpo de la respuesta de error:', errorBody);
+                    throw new Error(`Error al obtener datos del usuario: ${userResponse.status} ${userResponse.statusText}`);
+                }
+
+                const userData = await userResponse.json();
+                console.log('Datos del usuario cargados:', userData);
+
+                // Mostrar datos básicos del usuario
+                document.getElementById('userNameDisplay').textContent = userData.nombre || 'Usuario';
+                document.getElementById('profileName').textContent = userData.nombre || '';
+                document.getElementById('profileApellido').textContent = userData.apellido || '';
+                document.getElementById('profileEmail').textContent = userData.email || '';
+
+                if (userData.cedula) {
+                    document.getElementById('profileCedula').classList.remove('hidden');
+                    document.getElementById('profileCedula').querySelector('span').textContent = userData.cedula;
+                }
+                
+                // Cargar y mostrar identificador familiar
+                if (userData.familia_id || userData.es_jefe_familia) {
+                     try {
+                         // Usar el nuevo endpoint para obtener el identificador familiar
+                         const familiaResponse = await fetch('/api/familiares/identificador', {
+                             method: 'GET',
+                             headers: {
+                                 'Authorization': `Bearer ${tokenToUse}`,
+                                 'Content-Type': 'application/json'
+                             }
+                         });
+
+                         const familiaIdentifierSpan = document.getElementById('profileIdentificador').querySelector('span');
+
+                         if (familiaResponse.ok) {
+                             const familiaData = await familiaResponse.json();
+                             if (familiaData.identificador) {
+                                 familiaIdentifierSpan.textContent = familiaData.identificador;
+                                 document.getElementById('profileIdentificador').classList.remove('hidden');
+                             } else {
+                                 // Si no se encuentra identificador pero debería tener uno (ej. jefe sin familia_id)
+                                  familiaIdentifierSpan.textContent = 'Identificador no disponible'; // O un mensaje más específico
+                                   document.getElementById('profileIdentificador').classList.remove('hidden');
+                                  console.warn('Se esperaba identificador familiar pero no se recibió.', familiaData);
+                                   return; // Agregar un return aquí para salir del bloque if
+                             }
+                         } else {
+                             // Manejar errores de la respuesta del endpoint (ej. 404 si no tiene familia)
+                              const errorData = await familiaResponse.json();
+                             console.error('Error al obtener identificador familiar:', familiaResponse.status, errorData.message);
+                             // Podrías mostrar un mensaje al usuario si el identificador no es crucial para todos
+                              familiaIdentifierSpan.textContent = 'No aplicable o no encontrado';
+                              document.getElementById('profileIdentificador').classList.remove('hidden'); // Mostrar el campo igual con el mensaje
+                               return; // Agregar un return aquí para salir del bloque else
+                         }
+
+                         // Mostrar rol (simplificado por ahora)
+                         const rolSpan = document.getElementById('profileRol').querySelector('span');
+                         if(userData.es_jefe_familia) {
+                             rolSpan.textContent = 'Jefe de Familia';
+                              document.getElementById('profileRol').classList.remove('hidden');
+                         } else if (userData.familia_id) {
+                             rolSpan.textContent = 'Miembro de Familia';
+                              document.getElementById('profileRol').classList.remove('hidden');
+                         }
+
+                     } catch (familiaError) {
+                         console.error('Error al cargar datos de familia:', familiaError);
+                     }
+                }
+
+
+            } catch (error) {
+                console.error('Error al cargar datos del usuario o token inválido:', error);
+                localStorage.removeItem('authToken');
+                window.location.href = '/login.html'; // Redirigir a login
+                return; // Agregar un return aquí para asegurar que la función termina después de la redirección
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = '/'; // Redirigir a la página principal después de cerrar sesión
+        }
+
+        // Cargar datos al cargar la página
+        document.addEventListener('DOMContentLoaded', loadUserData);
+
+    </script>
+
+</body>
+</html> 

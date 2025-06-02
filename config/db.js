@@ -1,6 +1,13 @@
-const mysql = require('mysql2/promise');
-const config = require('../config/config');
+/**
+ * Configuración y conexión a la base de datos MySQL
+ * @module config/db
+ */
 
+const mysql = require('mysql2/promise');
+const config = require('./config');
+const logger = require('./logger');
+
+// Crear pool de conexiones
 const pool = mysql.createPool({
     host: config.db.host,
     user: config.db.user,
@@ -11,16 +18,27 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Probar la conexión
-pool.getConnection()
-    .then(connection => {
-        console.log('Conexión a la base de datos MySQL exitosa!');
-        connection.release(); // Liberar la conexión
-    })
-    .catch(err => {
-        console.error('Error al conectar con la base de datos MySQL:', err.message);
-        // Puedes decidir si quieres cerrar la aplicación si la conexión falla
-        // process.exit(1);
-    });
+/**
+ * Verifica la conexión a la base de datos
+ * @async
+ * @function testConnection
+ * @returns {Promise<void>}
+ */
+async function testConnection() {
+    try {
+        const connection = await pool.getConnection();
+        logger.info('Conexión a la base de datos MySQL exitosa');
+        connection.release();
+    } catch (err) {
+        logger.error('Error al conectar con la base de datos MySQL:', err.message);
+        throw err;
+    }
+}
+
+// Probar la conexión al iniciar
+testConnection().catch(err => {
+    logger.error('No se pudo establecer la conexión inicial con la base de datos');
+    process.exit(1);
+});
 
 module.exports = pool; 

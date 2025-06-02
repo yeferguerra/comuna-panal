@@ -1,10 +1,20 @@
+/**
+ * Configuración de Passport.js para autenticación
+ * @module config/passport
+ */
+
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('./db');
+const config = require('./config');
+const logger = require('./logger');
 
+/**
+ * Serializa el usuario para la sesión
+ * @param {Object} user - Usuario a serializar
+ * @param {Function} done - Callback de Passport
+ */
 passport.serializeUser((user, done) => {
-    console.log('Serializando usuario:', user);
-    // Si el usuario es temporal (viene de Google y no está en la BD)
     if (!user.id) {
         return done(null, { 
             isTemporary: true,
@@ -14,15 +24,16 @@ passport.serializeUser((user, done) => {
             google_id: user.google_id
         });
     }
-    // Si el usuario existe en la BD
     done(null, user.id);
 });
 
+/**
+ * Deserializa el usuario de la sesión
+ * @param {number|Object} id - ID del usuario o objeto temporal
+ * @param {Function} done - Callback de Passport
+ */
 passport.deserializeUser(async (id, done) => {
     try {
-        console.log('Deserializando usuario con ID:', id);
-        
-        // Si es un usuario temporal
         if (typeof id === 'object' && id.isTemporary) {
             return done(null, id);
         }
@@ -35,28 +46,26 @@ passport.deserializeUser(async (id, done) => {
         connection.release();
         
         if (users.length > 0) {
-            console.log('Usuario encontrado:', users[0]);
             done(null, users[0]);
         } else {
-            console.log('Usuario no encontrado');
             done(null, false);
         }
     } catch (error) {
-        console.error('Error al deserializar usuario:', error);
+        logger.error('Error al deserializar usuario:', error);
         done(error, null);
     }
 });
 
+/**
+ * Estrategia de autenticación con Google
+ */
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/api/auth/google/callback"
+    clientID: config.auth.google.clientID,
+    clientSecret: config.auth.google.clientSecret,
+    callbackURL: config.auth.google.callbackURL
 },
 async (accessToken, refreshToken, profile, done) => {
     try {
-        console.log('Perfil de Google recibido:', profile);
-        console.log('Email:', profile.emails[0].value);
-        
         const connection = await db.getConnection();
         
         // Buscar usuario existente
@@ -66,13 +75,11 @@ async (accessToken, refreshToken, profile, done) => {
         );
 
         if (existingUsers.length > 0) {
-            console.log('Usuario existente encontrado:', existingUsers[0]);
             connection.release();
             return done(null, existingUsers[0]);
         }
 
         // Si no existe, devolver los datos del perfil de Google
-        console.log('Usuario no encontrado, devolviendo datos de Google');
         connection.release();
         return done(null, {
             nombre: profile.name.givenName || profile.displayName,
@@ -81,7 +88,7 @@ async (accessToken, refreshToken, profile, done) => {
             google_id: profile.id
         });
     } catch (error) {
-        console.error('Error en estrategia de Google:', error);
+        logger.error('Error en estrategia de Google:', error);
         return done(error, null);
     }
 }));

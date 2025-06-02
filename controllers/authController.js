@@ -23,6 +23,20 @@ function generarIdentificadorFamiliar() {
     return identificador;
 }
 
+// Función auxiliar para calcular la edad
+function calcularEdad(fechaNacimiento) {
+    const fechaNac = new Date(fechaNacimiento);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+    const mes = hoy.getMonth() - fechaNac.getMonth();
+    
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+        edad--;
+    }
+    
+    return edad;
+}
+
 // Registrar nuevo usuario
 const register = async (req, res) => {
     let connection; // Declarar variable de conexión
@@ -33,21 +47,15 @@ const register = async (req, res) => {
         const { email, password, nombre, apellido, cedula, tipoRegistro, identificadorFamiliar, direccion, telefono, fechaNacimiento } = req.body;
 
         // Validar Fecha de Nacimiento y edad en el backend (validación de seguridad)
-        const fechaNacimientoDate = new Date(fechaNacimiento);
-        const today = new Date();
-        const age = today.getFullYear() - fechaNacimientoDate.getFullYear();
-        const monthDiff = today.getMonth() - fechaNacimientoDate.getMonth();
-        
-        // Ajuste por si aún no ha cumplido años en el mes actual
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < fechaNacimientoDate.getDate())) {
-            age--;
+        if (!fechaNacimiento) {
+            await connection.rollback();
+            connection.release();
+            return res.status(400).json({ error: 'La fecha de nacimiento es obligatoria.' });
         }
 
-        if (!fechaNacimiento) {
-             await connection.rollback();
-             connection.release();
-             return res.status(400).json({ error: 'La fecha de nacimiento es obligatoria.' });
-        } else if (age < 5) {
+        const age = calcularEdad(fechaNacimiento);
+        
+        if (age < 5) {
             await connection.rollback();
             connection.release();
             return res.status(400).json({ error: 'Debes tener al menos 5 años para registrarte.' });
@@ -85,8 +93,16 @@ const register = async (req, res) => {
             }
         }
 
-        // Hashear la contraseña
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Hashear la contraseña solo si no viene de Google
+        let hashedPassword = null;
+        if (!req.body.google_id) {
+            if (!password) {
+                await connection.rollback();
+                connection.release();
+                return res.status(400).json({ error: 'La contraseña es obligatoria para registro normal.' });
+            }
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
 
         let familiaId = null;
         let esJefeFamilia = false;
@@ -105,10 +121,10 @@ const register = async (req, res) => {
             );
             familiaId = familiaResult.insertId;
 
-            // Insertar el nuevo usuario (ahora incluyendo fecha_nacimiento)
+            // Insertar el nuevo usuario (ahora incluyendo fecha_nacimiento y google_id)
             const [usuarioResult] = await connection.execute(
-                'INSERT INTO usuarios (nombre, apellido, cedula, email, password, fecha_nacimiento, familia_id, es_jefe_familia, direccion, telefono) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [nombre, apellido, age >= 10 ? cedula : null, email, hashedPassword, fechaNacimiento, familiaId, esJefeFamilia, direccion, telefono]
+                'INSERT INTO usuarios (nombre, apellido, cedula, email, password, fecha_nacimiento, familia_id, es_jefe_familia, direccion, telefono, google_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [nombre, apellido, age >= 10 ? cedula : null, email, hashedPassword, fechaNacimiento, familiaId, esJefeFamilia, direccion, telefono, req.body.google_id || null]
             );
             nuevoUsuarioId = usuarioResult.insertId;
 
@@ -149,10 +165,10 @@ const register = async (req, res) => {
 
             familiaId = familiaExistente[0].id;
 
-            // Insertar el nuevo usuario (sin familia_id ni es_jefe_familia por ahora, pero con fecha_nacimiento)
+            // Insertar el nuevo usuario (sin familia_id ni es_jefe_familia por ahora, pero con fecha_nacimiento y google_id)
             const [usuarioResult] = await connection.execute(
-                'INSERT INTO usuarios (nombre, apellido, cedula, email, password, fecha_nacimiento, direccion, telefono) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [nombre, apellido, age >= 10 ? cedula : null, email, hashedPassword, fechaNacimiento, direccion, telefono]
+                'INSERT INTO usuarios (nombre, apellido, cedula, email, password, fecha_nacimiento, direccion, telefono, google_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [nombre, apellido, age >= 10 ? cedula : null, email, hashedPassword, fechaNacimiento, direccion, telefono, req.body.google_id || null]
             );
             nuevoUsuarioId = usuarioResult.insertId;
 
@@ -174,22 +190,26 @@ const register = async (req, res) => {
         const token = generateToken(nuevoUsuarioId);
 
         // Obtener los datos del usuario recién creado para la respuesta
-        const [newUser] = await connection.execute(
-            'SELECT id, nombre, apellido, cedula, email, familia_id, es_jefe_familia, fecha_nacimiento FROM usuarios WHERE id = ?',
-            [nuevoUsuarioId]
-        );
+        const userResponse = { id: nuevoUsuarioId, email: email, nombre: nombre, apellido: apellido };
 
-        connection.release(); // Liberar conexión
-
-        const userResponse = newUser[0];
-
-        // Incluir identificador familiar en la respuesta si se creó una nueva familia
-        if (tipoRegistro === 'nueva') {
+        // Incluir identificador familiar en la respuesta/redirección si se creó una nueva familia
+        if (tipoRegistro === 'nueva' && generadoIdentificador) {
             userResponse.identificadorFamiliar = generadoIdentificador;
-            res.status(201).json({ message: 'Registro exitoso. ¡Nueva familia creada!', user: userResponse, token });
-        } else {
-            res.status(201).json({ message: 'Solicitud de unión a familia enviada. Esperando aprobación del jefe de familia.', user: userResponse, token });
+            console.log('Nuevo registro con familia, identificador:', generadoIdentificador); // Log para verificar
         }
+
+        connection.release(); // Liberar conexión antes de enviar respuesta/redirigir
+
+        // Modificar para enviar respuesta JSON en lugar de redirigir
+        console.log('Registro completado, enviando respuesta JSON...'); // Log para verificar
+        res.status(201).json({ 
+            message: 'Registro exitoso',
+            user: userResponse, // Incluir datos básicos del usuario y el identificador si aplica
+            // Puedes incluir el token aquí si quieres loguearlo automáticamente después del registro
+            // token: token // <-- Descomentar si quieres login automático después de registro
+        });
+
+        // Las redirecciones se manejarán ahora en el frontend después de recibir este JSON
 
     } catch (error) {
         if (connection) {
@@ -197,7 +217,9 @@ const register = async (req, res) => {
             connection.release(); // Liberar conexión
         }
         console.error('Error en el registro:', error);
-        res.status(500).json({ error: 'Error en el registro de usuario.' });
+        // Mejorar el mensaje de error para el frontend si es posible
+        const errorMessage = error.sqlMessage || error.message || 'Error en el registro de usuario.';
+        res.status(500).json({ error: errorMessage });
     }
 };
 
@@ -236,7 +258,9 @@ const login = async (req, res) => {
 
         connection.release();
 
-        res.json({ token });
+        // Redirigir a la página de home del usuario con el token
+        res.redirect(`/user-home?token=${token}`);
+
     } catch (error) {
         if (connection) connection.release();
         console.error('Error en el login:', error);
@@ -244,43 +268,57 @@ const login = async (req, res) => {
     }
 };
 
-// Modificar la función getUser para obtener datos del usuario de MySQL
+// @desc    Get user data by token
+// @route   GET /api/auth/me
+// @access  Private
 const getUser = async (req, res) => {
-    let connection;
+    console.log('authController.getUser: Iniciado.'); // Log
+    console.log('authController.getUser: req.user (del middleware auth):', req.user); // Log
     try {
-        connection = await db.getConnection();
-        // req.user.id debe venir del middleware de autenticación que usa el token JWT
-        const userId = req.user.id;
+        // El middleware auth ya ha adjuntado el usuario autenticado a req.user
+        // Si req.user contiene solo el ID (serialización), necesitamos obtener los datos completos
+        // Si req.user ya contiene los datos completos (deserialización/Google), usar esos
 
-        // Buscar usuario por ID, excluyendo la contraseña
-        const [users] = await connection.execute(
-            'SELECT id, nombre, apellido, cedula, email, familia_id, es_jefe_familia FROM usuarios WHERE id = ? LIMIT 1',
-            [userId]
-        );
+        let userData = req.user;
 
-        const user = users[0];
-
-        if (!user) {
+        // Si req.user es solo el ID, buscar en la BD
+        if (userData && typeof userData.id === 'number') {
+             console.log('authController.getUser: req.user es un ID numérico, buscando en BD...', userData.id); // Log
+            const connection = await db.getConnection();
+            const [users] = await connection.execute(
+                'SELECT id, nombre, apellido, email, cedula, familia_id, es_jefe_familia FROM usuarios WHERE id = ?',
+                [userData.id]
+            );
             connection.release();
-            return res.status(404).json({ message: 'Usuario no encontrado' });
+
+            if (users.length === 0) {
+                 console.log('authController.getUser: Usuario no encontrado en BD para ID:', userData.id); // Log
+                return res.status(404).json({ error: 'Usuario no encontrado' });
+            }
+            userData = users[0];
+             console.log('authController.getUser: Datos de usuario obtenidos de BD:', userData); // Log
+        } else if (userData && userData.email && userData.google_id) {
+             // Si req.user ya parece ser un objeto de datos de Google (nuevo usuario)
+             console.log('authController.getUser: req.user parece ser un objeto de datos de Google (nuevo usuario):', userData); // Log
+             // No buscamos en BD aquí, ya tenemos los datos temporales.
+             // Nota: Un usuario de Google registrado *existente* debería tener req.user.id
+        } else {
+             console.log('authController.getUser: req.user no tiene el formato esperado:', userData); // Log
+            return res.status(401).json({ error: 'Usuario no autenticado o datos inválidos' });
         }
-
-        // TODO: Opcional: Obtener familiares asociados a esta familia si es necesario en el perfil
-        // Esto podría ser otra consulta a la tabla usuarios con el mismo familia_id
-
-        connection.release();
-
-        res.json(user); // Devolver los datos del usuario
+        
+        // Aquí, userData debería contener los datos del usuario a enviar al frontend
+        console.log('authController.getUser: Enviando datos de usuario al frontend:', userData); // Log final antes de enviar respuesta
+        res.json(userData);
 
     } catch (error) {
-        if (connection) connection.release();
-        console.error('Error al obtener usuario:', error);
-        res.status(500).json({ message: 'Error del servidor' });
+        console.error('authController.getUser: Error en el controlador:', error);
+        res.status(500).json({ error: 'Error al obtener datos del usuario' });
     }
 };
 
 // Las funciones getProfile, updateProfile y logout pueden necesitar ajustes dependiendo de su uso exacto y los datos requeridos
-// getProfile y updateProfile probablemente ya no necesiten .populate('familiares') si esa relación se maneja de forma diferente en MySQL
+// getProfile y updateProfile probablemente ya no necesitan .populate('familiares') si esa relación se maneja de forma diferente en MySQL
 // updateProfile necesitará lógica para actualizar en la tabla usuarios y posiblemente hashear la nueva contraseña
 
 // La función logout en general no interactúa con la base de datos en este enfoque (solo manejo de token en frontend)

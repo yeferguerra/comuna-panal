@@ -23,65 +23,103 @@ router.get('/me', auth, authController.getUser);
 // Rutas de Google
 router.get('/google', (req, res, next) => {
     console.log('Iniciando autenticación con Google...');
+    const callbackURL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/api/auth/google/callback";
+    console.log('URL de callback configurada para enviar a Google:', callbackURL);
     passport.authenticate('google', { 
         scope: ['profile', 'email'],
-        prompt: 'select_account'
+        prompt: 'select_account',
+        callbackURL: callbackURL
     })(req, res, next);
 });
 
 router.get('/google/callback',
     (req, res, next) => {
         console.log('Callback de Google recibido...');
+        console.log('URL de callback configurada:', process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/api/auth/google/callback");
         passport.authenticate('google', { 
-            failureRedirect: '/login.html?error=google_auth_failed',
-            failureMessage: true,
+            failureRedirect: '/login.html?error=google_auth_failed', 
             session: true
         })(req, res, next);
     },
     async (req, res) => {
         try {
-            console.log('Usuario autenticado:', req.user);
+            console.log('Callback de Google: Manejador de éxito iniciado.');
+            console.log('Callback de Google: req.user después de passport.authenticate:', req.user);
+            console.log('Callback de Google: Origen de la solicitud (req.headers.origin):', req.headers.origin);
+            console.log('Callback de Google: Referer de la solicitud (req.headers.referer):', req.headers.referer);
             
+            let baseUrl = '/'; // Default a raíz si no hay variable de entorno
+            if (process.env.GOOGLE_CALLBACK_URL) {
+                try {
+                    const callbackUrlObj = new URL(process.env.GOOGLE_CALLBACK_URL);
+                    baseUrl = `${callbackUrlObj.protocol}//${callbackUrlObj.host}`; // Construir base URL (e.g., https://tu-ngrok.app)
+                } catch (error) {
+                    console.error('Error al parsear GOOGLE_CALLBACK_URL para base URL:', error);
+                    // Fallback a localhost si la variable de entorno es inválida
+                    baseUrl = 'http://localhost:3000';
+                }
+            } else {
+                // Fallback a localhost si la variable de entorno no está definida
+                baseUrl = 'http://localhost:3000';
+            }
+
+            console.log('Callback de Google: Base URL determinada para redirección:', baseUrl);
+
             if (!req.user) {
-                console.error('No se recibió el usuario en el callback');
+                console.error('Callback de Google: No se recibió el usuario en req.user (post-auth).');
                 return res.redirect('/login.html?error=no_user_data');
             }
 
-            // Verificar si el usuario existe en la base de datos
-            const connection = await db.getConnection();
-            const [users] = await connection.execute(
-                'SELECT * FROM usuarios WHERE email = ?',
-                [req.user.email]
-            );
-            connection.release();
+            // En este punto, req.user contiene los datos del perfil de Google o del usuario de la BD
+            // según lo que devuelva done() en config/passport.js
 
-            console.log('Búsqueda de usuario:', users);
+            // Si el usuario viene de la BD (ya registrado):
+            if (req.user.id) {
+                console.log('Callback de Google: Usuario de Google ya registrado detectado (ID:', req.user.id, ').');
+                if (!req.user.email) {
+                    console.error('Callback de Google: Usuario registrado sin email en req.user.', req.user);
+                    return res.redirect('/login.html?error=user_data_missing');
+                }
 
-            if (users.length === 0) {
-                console.log('Usuario no encontrado, redirigiendo a registro...');
-                // Si el usuario no existe, redirigir a registro con los datos de Google
-                const userData = {
+                console.log('Callback de Google: Generando token para usuario registrado...');
+                console.log('Callback de Google: Secreto JWT usado para firmar:', process.env.JWT_SECRET || 'comuna_el_panal_2021_super_secreta_123');
+                const token = jwt.sign(
+                    { id: req.user.id, email: req.user.email },
+                    process.env.JWT_SECRET || 'comuna_el_panal_2021_super_secreta_123',
+                    { expiresIn: '24h' }
+                );
+                console.log('Callback de Google: Token generado. Redirigiendo a user-home...');
+                const redirectUrl = baseUrl ? `${baseUrl}/user-home?token=${token}` : `/user-home?token=${token}`;
+                console.log('Callback de Google: Redirigiendo a URL:', redirectUrl);
+                return res.redirect(redirectUrl);
+            }
+
+            // Si el usuario NO viene de la BD (nuevo registro con Google):
+            if (req.user.google_id && req.user.email && req.user.nombre) {
+                 console.log('Callback de Google: Usuario de Google NO registrado detectado.');
+                 console.log('Callback de Google (Nuevo Usuario): Origen de la solicitud (req.headers.origin):', req.headers.origin);
+                 console.log('Callback de Google (Nuevo Usuario): Referer de la solicitud (req.headers.referer):', req.headers.referer);
+                 
+                 const userData = {
                     nombre: req.user.nombre,
                     apellido: req.user.apellido,
                     email: req.user.email,
                     google_id: req.user.google_id
                 };
-                // Codificar los datos del usuario para pasarlos como parámetros de URL
                 const userDataEncoded = encodeURIComponent(JSON.stringify(userData));
-                return res.redirect(`/register.html?google_data=${userDataEncoded}`);
+                console.log('Callback de Google: Redirigiendo a registro con datos de Google...');
+                const redirectUrl = baseUrl ? `${baseUrl}/register.html?google_data=${userDataEncoded}` : `/register.html?google_data=${userDataEncoded}`;
+                console.log('Callback de Google (Nuevo Usuario): Base URL determinada para redirección:', baseUrl);
+                console.log('Callback de Google (Nuevo Usuario): Redirigiendo a URL final:', redirectUrl);
+                return res.redirect(redirectUrl);
             }
 
-            console.log('Usuario encontrado, generando token...');
-            // Si el usuario existe, generar token y redirigir a la página principal
-            const token = jwt.sign(
-                { id: users[0].id, email: users[0].email },
-                process.env.JWT_SECRET || 'comuna_el_panal_2021_super_secreta_123',
-                { expiresIn: '24h' }
-            );
+            // Si no se pudo manejar el usuario autenticado por alguna razón inesperada
+            console.error('Callback de Google: Usuario autenticado por Google con datos insuficientes para registro o login.', req.user);
+            res.redirect('/login.html?error=google_auth_failed');
 
-            res.redirect(`/?token=${token}`);
         } catch (error) {
-            console.error('Error en callback de Google:', error);
+            console.error('Callback de Google: Error en el manejador de éxito:', error);
             res.redirect('/login.html?error=server_error');
         }
     }

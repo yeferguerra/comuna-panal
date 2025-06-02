@@ -236,67 +236,117 @@
         </section>
     </main>
 
-    <footer class="bg-blue-800 text-white p-6 text-center mt-12">
-        <p>&copy; 2024-2025 Comuna Socialista El Panal 2021. Todos los derechos reservados.</p>
-        <p>Desarrollado para el pueblo y por el pueblo.</p>
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024-2025 Comuna Socialista El Panal 2021. Todos los derechos reservados.</p>
+            <p class="text-sm mt-2">Desarrollado para el pueblo y por el pueblo.</p>
+        </div>
     </footer>
 
-    <script src="/js/scripts.js"></script>
     <script>
-        // Verificar si el usuario está autenticado
-        async function checkAuth() {
-            const token = localStorage.getItem('token');
-            const userMenu = document.getElementById('userMenu');
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
             const authButtons = document.getElementById('auth-buttons');
-            const navAuthLink = document.getElementById('nav-auth-link');
+            const userMenu = document.getElementById('userMenu');
+            const userNameSpan = document.getElementById('userName');
             const heroAuthButton = document.getElementById('hero-auth-button');
+            const navAuthLink = document.getElementById('nav-auth-link');
+            const identificadorFamiliarDisplay = document.createElement('p'); // Elemento para mostrar el identificador
+            identificadorFamiliarDisplay.id = 'user-identificador';
+            identificadorFamiliarDisplay.className = 'text-gray-700 mt-2'; // Clases de Tailwind para estilo
+
+            let storedToken = localStorage.getItem('authToken');
 
             if (token) {
+                // Token en la URL (después de login/registro)
+                localStorage.setItem('authToken', token);
+                storedToken = token;
+                // Limpiar URL para remover el token (opcional pero recomendado)
+                history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            if (storedToken) {
+                // Intentar cargar datos del usuario si hay un token
                 try {
                     const response = await fetch('/api/auth/user', {
+                        method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${storedToken}`,
+                            'Content-Type': 'application/json'
                         }
                     });
 
                     if (response.ok) {
                         const userData = await response.json();
-                        document.getElementById('userName').textContent = userData.nombre;
-                        userMenu.classList.remove('hidden');
+                        console.log('Datos del usuario cargados:', userData); // Log para depurar
+                        userNameSpan.textContent = userData.nombre || 'Usuario';
+                        
+                        // Mostrar identificador si existe y no es registro normal
+                        // Solo mostrar si tiene familia_id o es_jefe_familia
+                        if (userData.familia_id || userData.es_jefe_familia) {
+                            // Necesitamos una ruta o lógica en el backend para obtener el identificador familiar
+                            // Por ahora, si eres jefe, usamos el email o algo temporal.
+                            // TODO: Crear endpoint para obtener identificador familiar si es jefe/miembro
+                             const familiaResponse = await fetch(`/api/familiares/identificador/${userData.familia_id || 'me'}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': `Bearer ${storedToken}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                             if (familiaResponse.ok) {
+                                 const familiaData = await familiaResponse.json();
+                                 if(familiaData.identificador) {
+                                     identificadorFamiliarDisplay.textContent = `Identificador Familiar: ${familiaData.identificador}`;
+                                     userMenu.appendChild(identificadorFamiliarDisplay); // Agregar al menú del usuario
+                                 } else if (userData.es_jefe_familia) {
+                                     // Si es jefe pero no obtuvimos identificador (temporal), usar el id del usuario como placeholder
+                                      identificadorFamiliarDisplay.textContent = `Identificador de tu familia (temporal): ${userData.id}`; // Reemplazar con el identificador real del backend
+                                       userMenu.appendChild(identificadorFamiliarDisplay); // Agregar al menú del usuario
+                                 }
+                             }
+                        }
+
+                        // Mostrar menú de usuario y ocultar botones de auth
                         authButtons.classList.add('hidden');
-                        if (navAuthLink) navAuthLink.classList.add('hidden');
+                        userMenu.classList.remove('hidden');
                         if (heroAuthButton) heroAuthButton.classList.add('hidden');
+                         if (navAuthLink) navAuthLink.classList.add('hidden');
+
                     } else {
-                        localStorage.removeItem('token');
-                        userMenu.classList.add('hidden');
+                        // Token inválido o expirado, limpiar storage
+                        console.error('Error al cargar datos del usuario:', response.statusText);
+                        localStorage.removeItem('authToken');
+                        // Asegurar que los botones de auth se muestren y el menú de usuario se oculte
                         authButtons.classList.remove('hidden');
-                        if (navAuthLink) navAuthLink.classList.remove('hidden');
-                        if (heroAuthButton) heroAuthButton.classList.remove('hidden');
+                        userMenu.classList.add('hidden');
+                         if (heroAuthButton) heroAuthButton.classList.remove('hidden');
+                         if (navAuthLink) navAuthLink.classList.remove('hidden');
                     }
                 } catch (error) {
                     console.error('Error al verificar autenticación:', error);
-                    localStorage.removeItem('token');
-                    userMenu.classList.add('hidden');
+                    localStorage.removeItem('authToken');
+                    // Asegurar que los botones de auth se muestren y el menú de usuario se oculte
                     authButtons.classList.remove('hidden');
-                    if (navAuthLink) navAuthLink.classList.remove('hidden');
-                    if (heroAuthButton) heroAuthButton.classList.remove('hidden');
+                    userMenu.classList.add('hidden');
+                     if (heroAuthButton) heroAuthButton.classList.remove('hidden');
+                     if (navAuthLink) navAuthLink.classList.remove('hidden');
                 }
-            } else {
-                userMenu.classList.add('hidden');
-                authButtons.classList.remove('hidden');
-                if (navAuthLink) navAuthLink.classList.remove('hidden');
-                if (heroAuthButton) heroAuthButton.classList.remove('hidden');
             }
-        }
+        });
 
-        // Función para cerrar sesión
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = '/';
-        }
+         function logout() {
+             localStorage.removeItem('authToken');
+             window.location.href = '/'; // Recargar la página
+         }
 
-        // Verificar autenticación al cargar la página
-        document.addEventListener('DOMContentLoaded', checkAuth);
+
     </script>
+
+    <script src="/js/phrases.js" defer></script>
+    <script src="/js/navbar.js"></script>
+
 </body>
 </html> 

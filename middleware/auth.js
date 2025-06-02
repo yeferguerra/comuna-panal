@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
-const User = require('../models/User');
+// const User = require('../models/User'); // No necesitamos el modelo Mongoose aquí si usamos MySQL
+const db = require('../config/db'); // Importar la conexión a MySQL
 
 // Middleware para verificar el token JWT
 const auth = async (req, res, next) => {
@@ -13,19 +14,28 @@ const auth = async (req, res, next) => {
         }
 
         // Verificar el token
+        console.log('Auth Middleware: Secreto JWT usado para verificar:', config.auth.jwtSecret);
         const decoded = jwt.verify(token, config.auth.jwtSecret);
-        const user = await User.findOne({ _id: decoded.id, activo: true });
+        console.log('Middleware auth: Token decodificado:', decoded); // Log
+
+        // Modificar para buscar el usuario en MySQL usando el ID numérico del token
+        const [rows] = await db.execute('SELECT * FROM usuarios WHERE id = ? AND activo = 1', [decoded.id]);
+        const user = rows[0]; // Obtener el primer resultado
 
         if (!user) {
-            throw new Error();
+            // Si no se encuentra usuario activo con ese ID
+            console.error('Auth Middleware: Usuario no encontrado o inactivo con ID del token:', decoded.id);
+            throw new Error('Usuario no encontrado o inactivo'); // Lanzar un error específico
         }
 
+        // Adjuntar el usuario a la solicitud
         req.token = token;
-        req.user = user;
+        req.user = user; // req.user ahora contiene los datos del usuario de MySQL
+        console.log('Auth Middleware: Usuario autenticado y adjuntado a req.user:', user.id); // Log éxito
         next();
     } catch (error) {
-        console.error('Error de autenticación:', error);
-        res.status(401).json({ message: 'Token inválido' });
+        console.error('Error de autenticación en Auth Middleware:', error.message || error);
+        res.status(401).json({ message: 'Token inválido' }); // Mantener mensaje genérico por seguridad
     }
 };
 

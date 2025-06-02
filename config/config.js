@@ -1,3 +1,8 @@
+/**
+ * Configuración global de la aplicación
+ * @module config/config
+ */
+
 require('dotenv').config();
 
 module.exports = {
@@ -10,9 +15,9 @@ module.exports = {
     // Configuración de la base de datos MySQL
     db: {
         host: process.env.DB_HOST || 'localhost',
-        user: process.env.DB_USER || 'root', // Usualmente 'root' para desarrollo
-        password: process.env.DB_PASSWORD || '', // La contraseña que configuraste en MySQL
-        database: process.env.DB_NAME || 'comunapanal' // El nombre de la base de datos que creamos
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'comunapanal'
     },
 
     // Configuración de la base de datos (MongoDB - si aún la necesitas o la eliminas después)
@@ -26,8 +31,22 @@ module.exports = {
 
     // Configuración de autenticación
     auth: {
-        jwtSecret: process.env.JWT_SECRET,
-        jwtExpiration: '24h'
+        jwtSecret: process.env.JWT_SECRET || 'comuna_el_panal_2021_super_secreta_123',
+        jwtExpiration: '24h',
+        google: {
+            clientID: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback'
+        }
+    },
+
+    // Configuración de sesiones
+    session: {
+        secret: process.env.SESSION_SECRET || 'comuna_el_panal_2021_super_secreta_123',
+        cookie: {
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000 // 24 horas
+        }
     },
 
     // Configuración de correo electrónico

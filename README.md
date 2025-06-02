@@ -1,1 +1,178 @@
-# Comuna Socialista El Panal 2021\n\n## Descripción del Proyecto\n\nEste proyecto es una plataforma digital para la gestión y comunicación de la Comuna Socialista El Panal 2021, ubicada en la parroquia 23 de Enero, Caracas. El objetivo es facilitar la organización comunal, el registro de familias, la comunicación de noticias y eventos, y la gestión de solicitudes ciudadanas.\n\nActualmente, el proyecto se encuentra en desarrollo temprano, enfocándose en la estructura básica del frontend y un backend inicial para la autenticación de usuarios y la gestión de familiares.\n\n## Estado Actual del Proyecto\n\nHemos establecido la estructura fundamental tanto en el frontend como en el backend, integrando la interfaz de usuario con una base de datos MongoDB.\n\n### Frontend (Directorio `public/`)\n\n*   **Página Principal (`index.html`):** Estructura base con secciones (Hero Banner, Bienvenida, Acceso al Sistema, Noticias, Eventos, Sobre Nosotros, Contacto) y navegación principal.\n*   **Estilos (CSS):** Separados en `public/css/styles.css` (estilos personalizados) y `public/css/normalize.css` (reseteo básico). Uso de TailwindCSS para utilidades de estilo.\n*   **Scripts (JavaScript):** Separados en `public/js/scripts.js` (scripts generales) y `public/js/familiares.js` (lógica para la gestión de familiares). El script en `index.html` maneja la lógica de autenticación básica en el lado del cliente.\n*   **Páginas de Autenticación:**\n    *   `public/login.html`: Página simple para inicio de sesión.\n    *   `public/register.html`: Página simple para registro de nuevas familias/usuarios.\n*   **Página de Gestión de Familiares (`public/familiares.html`):** Estructura básica para mostrar y gestionar miembros familiares.\n*   **Gestión de Autenticación en Frontend:** El script en `index.html` verifica la existencia de un token JWT en `localStorage`. Si existe, oculta los botones/enlaces de acceso/registro en la página principal (barra de navegación, hero banner y sección de \"Acceso al Sistema\") y muestra un menú de usuario con el nombre del usuario (obtenido del backend) y opciones como \"Gestión de Familiares\" y \"Cerrar Sesión\". Muestra un mensaje de bienvenida temporal después de iniciar sesión.\n*   **Assets:** Imágenes (`public/assets/images/`) e iconos (`public/assets/icons/`) utilizados en el frontend.\n\n### Backend\n\n*   **Servidor:** Montado con Node.js y Express (`server.js`).\n*   **Base de Datos:** Conexión a MongoDB utilizando Mongoose.\n*   **Modelos:**\n    *   `models/User.js`: Esquema para usuarios con campos como email, password, nombre, apellido, dirección, teléfono, rol (implementado lógica para asignar `superadmin` al primer usuario).\n    *   `models/Familiar.js`: Esquema básico para miembros familiares (asociado a un usuario).\n*   **Controladores (`controllers/`):** Lógica para manejar las peticiones:\n    *   `authController.js`: Funciones para registro (`register`), inicio de sesión (`login`) y obtención de datos del usuario autenticado (`getUser`).\n    *   `familiarController.js`: Funciones CRUD (Crear, Leer, Actualizar, Eliminar) básicas para familiares.\n*   **Rutas (`routes/`):** Definición de endpoints de la API:\n    *   `authRoutes.js`: Rutas para autenticación (`/api/auth/register`, `/api/auth/login`, `/api/auth/me`). La ruta `/me` está protegida.\n    *   `familiarRoutes.js`: Rutas para la gestión de familiares (`/api/familiares`). Estas rutas están protegidas por el middleware de autenticación.\n*   **Middleware (`middleware/auth.js`):** Middleware para verificar el token JWT y proteger rutas.\n*   **Configuración (`config/config.js`):** Archivo de configuración (por ahora básico).\n*   **Variables de Entorno:** Uso de archivo `.env` para variables sensibles (puerto, URL de DB, JWT Secret, etc.). Existe un `.env.example` como guía.\n\n### Herramientas Adicionales\n\n*   **Git:** Control de versiones.\n*   **GitHub:** Repositorio remoto para alojar el código.\n*   **nodemon:** Para reiniciar automáticamente el servidor durante el desarrollo.\n*   **bcrypt:** Para el hasheo seguro de contraseñas.\n*   **jsonwebtoken (jwt):** Para la autenticación basada en tokens.\n\n## Estructura del Proyecto\n\n```\ncomuna-panal/\n├── controllers/\n│   ├── authController.js\n│   └── familiarController.js\n├── middleware/\n│   └── auth.js\n├── models/\n│   ├── Familiar.js\n│   └── User.js\n├── public/\n│   ├── assets/\n│   │   ├── icons/\n│   │   └── images/\n│   ├── css/\n│   │   ├── normalize.css\n│   │   └── styles.css\n│   ├── js/\n│   │   ├── familiares.js\n│   │   └── scripts.js\n│   ├── familiares.html\n│   ├── index.html\n│   ├── login.html\n│   └── register.html\n├── routes/\n│   ├── authRoutes.js\n│   └── familiarRoutes.js\n├── .env.example\n├── .gitignore\n├── package.json\n├── README.md\n└── server.js\n```\n\n## Configuración e Instalación\n\nSigue estos pasos para poner el proyecto en funcionamiento localmente:\n\n1.  Clona el repositorio de GitHub:\n    ```bash\n    git clone https://github.com/tu-usuario/comuna-panal.git\n    ```\n2.  Navega al directorio del proyecto:\n    ```bash\n    cd comuna-panal\n    ```\n3.  Instala las dependencias del proyecto:\n    ```bash\n    npm install\n    ```\n    *(Asegúrate de tener Node.js y npm instalados en tu sistema)*\n4.  Crea un archivo `.env` en la raíz del proyecto basado en `.env.example`. Completa las variables de entorno necesarias (especialmente `DATABASE_URL` si usas MongoDB Atlas o una URL local, `JWT_SECRET`, etc.). Ejemplo:\n    ```env\n    PORT=3000\n    HOST=localhost\n    DATABASE_URL=mongodb://localhost:27017/comuna-panal\n    JWT_SECRET=superclaveultrasecreta\n    LOG_LEVEL=info\n    ```\n    *(Si usas MongoDB local, asegúrate de que tu servidor MongoDB esté corriendo)*\n5.  Inicia el servidor de desarrollo:\n    ```bash\n    npm run dev\n    ```\n    *(Esto usa nodemon para reiniciar el servidor automáticamente con los cambios)*\n6.  Abre tu navegador y ve a `http://localhost:3000` para ver la aplicación.\n\n## Próximos Pasos (Lista de Tareas)\n\nAquí hay una lista de tareas pendientes para continuar desarrollando el proyecto. Puedes ir marcando las casillas \[[x]] a medida que se completen:\n\n*   **Backend:**\n    *   \[ ] Implementar completamente la lógica CRUD en `familiarController.js` para interactuar con la base de datos.\n    *   \[ ] Agregar validación de datos en las rutas y controladores (usando librerías como Joi o Express-validator).\n    *   \[ ] Implementar manejo de errores más robusto en el backend.\n    *   \[ ] Agregar lógica para la gestión de Noticias y Eventos (modelos, controladores, rutas).\n    *   \[ ] Considerar roles y permisos más detallados (por ejemplo, ¿quién puede gestionar familiares, noticias, eventos?).\n    *   \[ ] Implementar funcionalidad de \"Olvidaste tu contraseña?\".\n    *   \[ ] Implementar cierre de sesión en el backend (invalidación de token si se implementa así).\n*   **Frontend:**\n    *   \[ ] Desarrollar la interfaz completa y la lógica en `public/familiares.html` y `public/js/familiares.js` para mostrar, agregar, editar y eliminar familiares, interactuando con el backend.\n    *   \[ ] Implementar la visualización de Noticias en `index.html` (posiblemente obteniéndolas del backend).\n    *   \[ ] Implementar la visualización de Eventos en `index.html` (posiblemente obteniéndolos del backend).\n    *   \[ ] Agregar formularios frontend para agregar/editar Noticias y Eventos (probablemente en páginas de administración separadas).\n    *   \[ ] Mejorar la interfaz de usuario y la experiencia del usuario en general.\n    *   \[ ] Implementar validación en los formularios frontend.\n    *   \[ ] Mostrar mensajes de éxito/error más amigables al usuario.\n*   **General:**\n    *   \[ ] Escribir pruebas (unitarias, de integración) para el backend y/o frontend.\n    *   \[ ] Implementar logging más detallado si es necesario.\n    *   \[ ] Configurar un pipeline de CI/CD para despliegue automático.\n    *   \[ ] Considerar la seguridad: protección contra ataques comunes (XSS, CSRF, inyección SQL/NoSQL), políticas CORS, etc.\n\n## Contribuciones\n\n¡Las contribuciones son bienvenidas! Si deseas contribuir, por favor, haz un fork del repositorio, crea una rama para tu funcionalidad (`git checkout -b feature/nueva-funcionalidad`), realiza tus cambios, haz commit (`git commit -m 'feat: agregar nueva funcionalidad'`), push a tu fork (`git push origin feature/nueva-funcionalidad`) y abre un Pull Request.\n\n## Licencia\n\n[Especificar tipo de licencia, si aplica]\n\n---\n\n*Este README ha sido generado automáticamente y puede ser actualizado a medida que el proyecto evoluciona.* 
+# Comuna Socialista El Panal - Documentación Técnica
+
+## Descripción Técnica
+Sistema web full-stack para la gestión comunal, construido con Node.js, Express y MySQL. Implementa autenticación OAuth2 con Google y sistema de roles basado en familias.
+
+## Stack Tecnológico
+- **Backend**: Node.js v18+, Express.js
+- **Base de Datos**: MySQL 8.0+
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
+- **Autenticación**: OAuth2 (Google), JWT
+- **Middleware**: Express-session, Passport.js
+
+## Estructura del Proyecto
+```
+comuna-panal/
+├── config/                 # Configuraciones
+│   ├── database.js        # Configuración MySQL
+│   └── passport.js        # Configuración OAuth
+├── controllers/           # Controladores
+│   ├── authController.js  # Lógica de autenticación
+│   └── userController.js  # Lógica de usuarios
+├── middleware/            # Middleware
+│   └── auth.js           # Verificación de autenticación
+├── models/               # Modelos de datos
+│   ├── User.js          # Modelo de usuario
+│   └── Family.js        # Modelo de familia
+├── public/              # Archivos estáticos
+│   ├── css/            # Estilos
+│   ├── js/             # Scripts del cliente
+│   └── assets/         # Recursos estáticos
+├── routes/             # Rutas de la API
+│   ├── auth.js         # Rutas de autenticación
+│   └── users.js        # Rutas de usuarios
+├── .env               # Variables de entorno
+├── .gitignore        # Archivos ignorados por git
+├── package.json      # Dependencias y scripts
+└── server.js         # Punto de entrada
+```
+
+## Dependencias Principales
+```json
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "passport": "^0.6.0",
+    "passport-google-oauth20": "^2.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.3"
+  }
+}
+```
+
+## Configuración del Entorno
+1. Variables de entorno requeridas (.env):
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=comunapanal
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+JWT_SECRET=your_jwt_secret
+SESSION_SECRET=your_session_secret
+```
+
+2. Configuración de la base de datos:
+```sql
+CREATE DATABASE comunapanal;
+USE comunapanal;
+
+CREATE TABLE usuarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    google_id VARCHAR(255) UNIQUE,
+    rol ENUM('admin', 'usuario') DEFAULT 'usuario',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE familias (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    direccion TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE usuario_rol_familia (
+    usuario_id INT,
+    familia_id INT,
+    rol ENUM('jefe', 'miembro') DEFAULT 'miembro',
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (familia_id) REFERENCES familias(id),
+    PRIMARY KEY (usuario_id, familia_id)
+);
+```
+
+## Endpoints de la API
+### Autenticación
+- `POST /api/auth/google` - Inicio de sesión con Google
+- `GET /api/auth/google/callback` - Callback de Google OAuth
+- `POST /api/auth/logout` - Cierre de sesión
+
+### Usuarios
+- `GET /api/users/me` - Obtener datos del usuario actual
+- `PUT /api/users/me` - Actualizar datos del usuario
+- `GET /api/users/:id/families` - Obtener familias del usuario
+
+### Familias
+- `GET /api/families` - Listar familias
+- `POST /api/families` - Crear familia
+- `PUT /api/families/:id` - Actualizar familia
+- `DELETE /api/families/:id` - Eliminar familia
+
+## Seguridad
+- Autenticación OAuth2 con Google
+- Tokens JWT para sesiones
+- Protección contra CSRF
+- Sanitización de inputs
+- Validación de datos
+- Encriptación de contraseñas con bcrypt
+
+## Scripts Disponibles
+```bash
+npm start        # Inicia el servidor en producción
+npm run dev      # Inicia el servidor en desarrollo con nodemon
+npm run test     # Ejecuta las pruebas
+npm run lint     # Ejecuta el linter
+```
+
+## Notas para Desarrolladores
+- Usar ESLint con la configuración proporcionada
+- Seguir el patrón MVC
+- Documentar cambios en el código
+- Mantener las migraciones de la base de datos actualizadas
+- Usar async/await para operaciones asíncronas
+- Implementar manejo de errores consistente
+
+## Estado del Proyecto
+- [x] Autenticación con Google
+- [x] Sistema de roles
+- [x] Gestión de familias
+- [ ] Panel de administración
+- [ ] Gestión de noticias
+- [ ] Gestión de eventos 
+
+## Próximos Pasos (Lista de Tareas)
+
+Aquí hay una lista de tareas pendientes para continuar desarrollando el proyecto. Puedes ir marcando las casillas \[[x]] a medida que se completen:
+
+*   **Backend:**
+    *   \[ ] Implementar completamente la lógica CRUD en `familiarController.js` para interactuar con la base de datos.
+    *   \[ ] Implementar validación de datos rigurosa en los endpoints (ej. con `express-validator`), comenzando por `POST /api/auth/register`.
+    *   \[ ] Implementar manejo de errores más robusto en el backend con códigos y mensajes específicos.
+    *   \[ ] Agregar lógica para la gestión de Noticias y Eventos (modelos, controladores, rutas).
+    *   \[ ] Considerar roles y permisos más detallados (por ejemplo, ¿quién puede gestionar familiares, noticias, eventos?).
+    *   \[ ] Implementar funcionalidad de "Olvidaste tu contraseña?".
+    *   \[ ] Implementar cierre de sesión en el backend (invalidación de token si se implementa así).
+*   **Frontend:**
+    *   \[ ] Desarrollar la interfaz completa y la lógica en `public/familiares.html` y `public/js/familiares.js` para mostrar, agregar, editar y eliminar familiares, interactuando con el backend.
+    *   \[ ] Implementar la visualización de Noticias en `index.html` (posiblemente obteniéndolas del backend).
+    *   \[ ] Implementar la visualización de Eventos en `index.html` (posiblemente obteniéndolos del backend).
+    *   \[ ] Agregar formularios frontend para agregar/editar Noticias y Eventos (probablemente en páginas de administración separadas).
+    *   \[ ] Mejorar la interfaz de usuario y la experiencia del usuario en general.
+    *   \[ ] Implementar validación en los formularios frontend.
+    *   \[ ] Mostrar mensajes de éxito/error más amigables al usuario.
+*   **General:**
+    *   \[ ] Agregar pruebas automatizadas (unitarias, de integración, e2e) para el backend y/o frontend.
+    *   \[ ] Agregar documentación de API técnica con Swagger/OpenAPI.
+    *   \[ ] Implementar un sistema de caché para reducir la carga en la base de datos.
+    *   \[ ] Implementar rate limiting en la API para proteger contra abusos.
+    *   \[ ] Implementar un sistema de monitoreo (ej. con Prometheus) para supervisar el rendimiento y errores.
+    *   \[ ] Considerar la implementación de un sistema de colas para tareas pesadas o de fondo.
+    *   \[ ] Agregar compresión (ej. Gzip) para respuestas HTTP para mejorar el rendimiento.
+    *   \[ ] Implementar un sistema de backup automático para la base de datos.
+    *   \[ ] Implementar logging más detallado si es necesario (ya se hizo en parte al centralizar, pero refinar). 

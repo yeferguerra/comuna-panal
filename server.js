@@ -1,3 +1,8 @@
+/**
+ * Servidor principal de la Comuna Socialista El Panal
+ * @module server
+ */
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -30,14 +35,24 @@ const logger = winston.createLogger({
 // Inicialización de la aplicación
 const app = express();
 
+// Configuración de CORS
+app.use(cors({
+    origin: process.env.NGROK_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
 // Configuración de sesiones
 app.use(session({
     secret: process.env.SESSION_SECRET || 'comuna_el_panal_2021_super_secreta_123',
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
-        secure: false, // Cambiar a true en producción con HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        sameSite: 'lax',
+        domain: process.env.COOKIE_DOMAIN || undefined
     }
 }));
 
@@ -52,18 +67,33 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rutas
+// Rutas API
 app.use('/api/auth', authRoutes);
 app.use('/api/familiares', familiarRoutes);
 
 // Rutas estáticas
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/login.html'));
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/register.html'));
+});
+
+app.get('/registration-success', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/registration-success.html'));
+});
+
+app.get('/user-home', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/user-home.html'));
 });
 
 // Manejo de errores
@@ -75,8 +105,9 @@ app.use((err, req, res, next) => {
 
 // Puerto
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 // Iniciar servidor
-app.listen(PORT, () => {
-    logger.info(`Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT, HOST, () => {
+    logger.info(`Servidor corriendo en http://${HOST}:${PORT}`);
 }); 
