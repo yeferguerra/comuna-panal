@@ -1,5 +1,5 @@
 // Funciones de autenticación
-const API_URL = 'http://localhost:3000/api';
+const API_URL = window.API_URL || '/api';
 
 // Función para registrar un nuevo usuario
 async function registerUser(userData) {

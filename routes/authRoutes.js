@@ -23,7 +23,12 @@ router.get('/me', auth, authController.getUser);
 // Rutas de Google
 router.get('/google', (req, res, next) => {
     console.log('Iniciando autenticación con Google...');
-    const callbackURL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/api/auth/google/callback";
+    console.log('Variables de entorno configuradas:');
+    console.log('- GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL);
+    console.log('- DEV_BASE_URL:', process.env.DEV_BASE_URL);
+    console.log('- NODE_ENV:', process.env.NODE_ENV);
+    
+    const callbackURL = process.env.GOOGLE_CALLBACK_URL;
     console.log('URL de callback configurada para enviar a Google:', callbackURL);
     passport.authenticate('google', { 
         scope: ['profile', 'email'],
@@ -33,34 +38,21 @@ router.get('/google', (req, res, next) => {
 });
 
 router.get('/google/callback',
-    (req, res, next) => {
-        console.log('Callback de Google recibido...');
-        console.log('URL de callback configurada:', process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/api/auth/google/callback");
-        passport.authenticate('google', { 
-            failureRedirect: '/login.html?error=google_auth_failed', 
-            session: true
-        })(req, res, next);
-    },
+    passport.authenticate('google', { failureRedirect: '/login.html' }),
     async (req, res) => {
         try {
-            console.log('Callback de Google: Manejador de éxito iniciado.');
+            console.log('Callback de Google recibido...');
+            console.log('URL de callback configurada:', process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/api/auth/google/callback");
             console.log('Callback de Google: req.user después de passport.authenticate:', req.user);
             console.log('Callback de Google: Origen de la solicitud (req.headers.origin):', req.headers.origin);
             console.log('Callback de Google: Referer de la solicitud (req.headers.referer):', req.headers.referer);
             
-            let baseUrl = '/'; // Default a raíz si no hay variable de entorno
-            if (process.env.GOOGLE_CALLBACK_URL) {
-                try {
-                    const callbackUrlObj = new URL(process.env.GOOGLE_CALLBACK_URL);
-                    baseUrl = `${callbackUrlObj.protocol}//${callbackUrlObj.host}`; // Construir base URL (e.g., https://tu-ngrok.app)
-                } catch (error) {
-                    console.error('Error al parsear GOOGLE_CALLBACK_URL para base URL:', error);
-                    // Fallback a localhost si la variable de entorno es inválida
-                    baseUrl = 'http://localhost:3000';
-                }
+            // Determinar la URL base para redirecciones
+            let baseUrl;
+            if (process.env.NODE_ENV === 'production') {
+                baseUrl = process.env.BASE_URL;
             } else {
-                // Fallback a localhost si la variable de entorno no está definida
-                baseUrl = 'http://localhost:3000';
+                baseUrl = process.env.DEV_BASE_URL;
             }
 
             console.log('Callback de Google: Base URL determinada para redirección:', baseUrl);
@@ -82,10 +74,10 @@ router.get('/google/callback',
                 }
 
                 console.log('Callback de Google: Generando token para usuario registrado...');
-                console.log('Callback de Google: Secreto JWT usado para firmar:', process.env.JWT_SECRET || 'comuna_el_panal_2021_super_secreta_123');
+                console.log('Callback de Google: Secreto JWT usado para firmar:', process.env.JWT_SECRET);
                 const token = jwt.sign(
                     { id: req.user.id, email: req.user.email },
-                    process.env.JWT_SECRET || 'comuna_el_panal_2021_super_secreta_123',
+                    process.env.JWT_SECRET,
                     { expiresIn: '24h' }
                 );
                 console.log('Callback de Google: Token generado. Redirigiendo a user-home...');

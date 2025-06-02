@@ -6,6 +6,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 const config = require('./config/config');
 const winston = require('winston');
@@ -17,7 +18,8 @@ const session = require('express-session');
 require('./config/passport'); // Importar la configuración de Passport
 
 // Cargar variables de entorno
-dotenv.config();
+const envPath = path.resolve(process.cwd(), '.env');
+dotenv.config({ path: envPath });
 
 // Configuración del logger
 const logger = winston.createLogger({
@@ -37,7 +39,7 @@ const app = express();
 
 // Configuración de CORS
 app.use(cors({
-    origin: process.env.NGROK_URL || 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN || process.env.NGROK_URL || 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
@@ -58,7 +60,7 @@ app.use(session({
 
 // Middleware para logging de sesiones
 app.use((req, res, next) => {
-    console.log('Sesión actual:', req.session);
+    console.log('Sesión ID:', req.sessionID);
     next();
 });
 
