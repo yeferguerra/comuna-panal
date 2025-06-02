@@ -31,18 +31,18 @@ module.exports = {
 
     // Configuración de autenticación
     auth: {
-        jwtSecret: process.env.JWT_SECRET || 'comuna_el_panal_2021_super_secreta_123',
+        jwtSecret: process.env.JWT_SECRET,
         jwtExpiration: '24h',
         google: {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/auth/google/callback'
+            callbackURL: process.env.GOOGLE_CALLBACK_URL
         }
     },
 
     // Configuración de sesiones
     session: {
-        secret: process.env.SESSION_SECRET || 'comuna_el_panal_2021_super_secreta_123',
+        secret: process.env.SESSION_SECRET,
         cookie: {
             secure: process.env.NODE_ENV === 'production',
             maxAge: 24 * 60 * 60 * 1000 // 24 horas

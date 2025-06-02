@@ -45,7 +45,7 @@ app.use(cors({
 
 // Configuración de sesiones
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'comuna_el_panal_2021_super_secreta_123',
+    secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
     cookie: {
